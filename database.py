@@ -248,6 +248,18 @@ async def delete_last_meal(user_id):
             print("⚠️ Nenhuma refeição encontrada para exclusão.")
         return None
 
+async def reset_user_data(telegram_id):
+    if EXIBIR_LOGS:
+        print(f"🚀 A iniciar o apagamento irreversível dos dados do utilizador: {telegram_id}...")
+    async with await get_async_connection() as conn:
+        await conn.execute("DELETE FROM meals WHERE user_id = ?", (telegram_id,))
+        await conn.execute("DELETE FROM water_logs WHERE user_id = ?", (telegram_id,))
+        await conn.execute("DELETE FROM exercises WHERE user_id = ?", (telegram_id,))
+        await conn.execute("DELETE FROM users WHERE telegram_id = ?", (telegram_id,))
+        await conn.commit()
+        if EXIBIR_LOGS:
+            print(f"✅ Dados do utilizador {telegram_id} apagados com sucesso.")
+
 async def get_all_users():
     if EXIBIR_LOGS:
         print("🚀 Iniciando varredura assíncrona de todos os usuários...")
