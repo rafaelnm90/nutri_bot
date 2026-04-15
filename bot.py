@@ -1550,6 +1550,55 @@ async def handle_shopping_check(update: Update, context: ContextTypes.DEFAULT_TY
     except Exception:
         pass
 
+async def cmd_resetar(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.message.from_user.id
+    if EXIBIR_LOGS:
+        logging.info(f"🚀 Utilizador {user_id} solicitou a reinicialização da conta...")
+        
+    aviso = (
+        "🚨 *ATENÇÃO: AÇÃO IRREVERSÍVEL* 🚨\n\n"
+        "Tem a certeza de que deseja apagar todo o seu histórico?\n"
+        "Isto eliminará o seu perfil, as suas metas diárias e todos os registos de refeições, água e exercícios.\n\n"
+        "Escolha uma das opções abaixo:"
+    )
+    
+    keyboard = [
+        [InlineKeyboardButton("❌ Cancelar", callback_data="reset_cancel")],
+        [InlineKeyboardButton("⚠️ Sim, apagar tudo", callback_data="reset_confirm")]
+    ]
+    
+    await update.message.reply_text(aviso, parse_mode='Markdown', reply_markup=InlineKeyboardMarkup(keyboard))
+
+async def handle_reset_confirmation(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    user_id = query.from_user.id
+    action = query.data
+    
+    if action == "reset_cancel":
+        if EXIBIR_LOGS:
+            logging.info(f"✅ Utilizador {user_id} cancelou a reinicialização.")
+        await query.edit_message_text("Ufa! Ação cancelada. Os seus dados continuam seguros e intactos. 🛡️")
+        await context.bot.send_message(chat_id=user_id, text="O que deseja fazer agora?", reply_markup=MAIN_MENU_KEYBOARD)
+        return
+        
+    if action == "reset_confirm":
+        if EXIBIR_LOGS:
+            logging.info(f"🚀 A processar a limpeza completa dos dados do utilizador {user_id}...")
+            
+        await db.reset_user_data(user_id)
+        context.user_data.clear()
+        
+        if EXIBIR_LOGS:
+            logging.info("✅ Limpeza efetuada com sucesso.")
+            
+        await query.edit_message_text(
+            "🧹 *Tudo limpo!*\n\n"
+            "O seu perfil e histórico foram apagados com sucesso.\n"
+            "Sempre que quiser recomeçar, basta enviar o comando /start ou clicar no botão Iniciar.",
+            parse_mode='Markdown'
+        )
+
 def main():
     # Token from environment
     token = os.environ.get("TELEGRAM_TOKEN")
@@ -1594,6 +1643,8 @@ def main():
     app.add_handler(CallbackQueryHandler(handle_meal_confirmation, pattern="^(meal_|it_)"))
     app.add_handler(CallbackQueryHandler(handle_weekly_checkin, pattern="^(checkin_|do_phase_)"))
     app.add_handler(CallbackQueryHandler(handle_shopping_check, pattern="^shop_"))
+    app.add_handler(CommandHandler("resetar", cmd_resetar))
+    app.add_handler(CallbackQueryHandler(handle_reset_confirmation, pattern="^reset_"))
     
     # General fallback for any message (other than commands) sent outside the ConversationHandler
     app.add_handler(MessageHandler(filters.ALL & ~filters.COMMAND, handle_message))
