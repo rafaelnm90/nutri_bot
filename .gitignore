@@ -1,0 +1,14 @@
+# Ambientes virtuais
+venv/
+env/
+
+# Banco de dados
+*.db
+nutri_bot.db
+
+# Segredos
+.env
+
+# Cache
+__pycache__/
+*.pyc
