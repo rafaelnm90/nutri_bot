@@ -1353,7 +1353,7 @@ async def check_reminders(context: ContextTypes.DEFAULT_TYPE):
             expected_water_now = water_goal * target_fraction
             deficit_ml = expected_water_now - water_drunk
             
-            if deficit_ml >= 250:
+            if deficit_ml >= 600:
                 last_str = user.get('last_water_reminder')
                 hours_since = 999
                 if last_str:
@@ -1364,7 +1364,10 @@ async def check_reminders(context: ContextTypes.DEFAULT_TYPE):
                     except:
                         pass
                 
-                threshold = 1.5 if deficit_ml >= 500 else 2.5
+                threshold = 2.5 if deficit_ml >= 1000 else 4.0
+                
+                if EXIBIR_LOGS:
+                    logging.info(f"🚀 Avaliando gatilho de água para {user_id}: Déficit de {deficit_ml:.1f}ml. Espera de {threshold}h exigida.")
                 
                 if hours_since >= threshold:
                     missing = water_goal - water_drunk
@@ -1389,7 +1392,7 @@ async def check_reminders(context: ContextTypes.DEFAULT_TYPE):
             cal_eaten = sum(m['calories'] for m in meals)
             deficit = target_fraction - (cal_eaten / cal_goal)
             
-            if deficit > 0.15:
+            if deficit > 0.35:
                 last_str = user.get('last_food_reminder')
                 hours_since = 999
                 if last_str:
@@ -1400,7 +1403,10 @@ async def check_reminders(context: ContextTypes.DEFAULT_TYPE):
                     except:
                         pass
                 
-                threshold = 2.0 if deficit > 0.3 else 4.0
+                threshold = 3.0 if deficit > 0.50 else 5.0
+                
+                if EXIBIR_LOGS:
+                    logging.info(f"🚀 Avaliando gatilho de comida para {user_id}: Déficit de {deficit*100:.1f}%. Espera de {threshold}h exigida.")
                 
                 if hours_since >= threshold:
                     missing = cal_goal - cal_eaten
