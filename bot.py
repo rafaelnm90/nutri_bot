@@ -35,9 +35,9 @@ API_KEY, GENDER, AGE, WEIGHT, HEIGHT, ACTIVITY, GOAL_TYPE, EXPERIENCE = range(8)
 
 MAIN_MENU_KEYBOARD = ReplyKeyboardMarkup(
     [
-        ['📊 Meu Resumo de Hoje', '💧 Registrar Água'],
-        ['💡 Sugerir Refeição', '🍽️ Registrar Comida'],
-        ['🛒 Ler Rótulo', '📋 Lista de Compras'],
+        ['📊 Meu Resumo de Hoje', '📈 Relatório Diário'],
+        ['💡 Sugerir Refeição', '🛒 Ler Rótulo'],
+        ['🍽️ Registrar Comida', '💧 Registrar Água'],
         ['🗑️ Resetar Dados']
     ],
     resize_keyboard=True
@@ -334,7 +334,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     photo_file = None
     text_input = update.message.text or ""
     
-    if text_input in ["📊 Meu Resumo de Hoje", "💧 Registrar Água", "🍽️ Registrar Comida", "💡 Sugerir Refeição", "🏋️ Registrar Exercício", "🛒 Ler Rótulo", "📋 Lista de Compras", "🗑️ Resetar Dados"]:
+    if text_input in ["📊 Meu Resumo de Hoje", "💧 Registrar Água", "🍽️ Registrar Comida", "💡 Sugerir Refeição", "🏋️ Registrar Exercício", "🛒 Ler Rótulo", "🗑️ Resetar Dados", "📈 Relatório Diário"]:
         if EXIBIR_LOGS:
             logging.info("🧹 Limpando estados temporários de edição para nova navegação...")
         context.user_data.pop('editing_index', None)
@@ -360,32 +360,20 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await db.save_user(user_id, {"step": "WAITING_LABEL"})
         await update.message.reply_text("🛒 Pode me mandar a foto da tabela nutricional ou lista de ingredientes do produto!\n\n_Para cancelar, toque em qualquer botão do menu._", parse_mode='Markdown', reply_markup=ReplyKeyboardRemove())
         return
-    elif text_input == "📋 Lista de Compras":
-        await db.save_user(user_id, {"step": "DONE"})
-        msg = await update.message.reply_text("Anotando os itens para sua próxima ida ao supermercado... 🛒📝", reply_markup=ReplyKeyboardRemove())
-        try:
-            from ai_service import generate_shopping_list
-            goal_type_val = user_db.get('goal_type', 'manter')
-            user_api_key = user_db.get('api_key')
-            list_data = await asyncio.to_thread(generate_shopping_list, goal_type_val, user_api_key)
-            
-            keyboard = []
-            for i, item in enumerate(list_data.get('items', [])):
-                keyboard.append([InlineKeyboardButton(f"⬜ {item}", callback_data=f"shop_{i}")])
-                
-            texto_lista = f"📋 *Sua Lista de Compras*\nFoco: {goal_type_val.capitalize()}\n\n_Toque nos itens para marcar o que já colocou no carrinho:_"
-            await msg.edit_text(texto_lista, parse_mode='Markdown', reply_markup=InlineKeyboardMarkup(keyboard))
-        except Exception as e:
-            logging.error(f"Erro ao gerar lista: {e}")
-            await msg.edit_text("Ops, tive um probleminha ao gerar sua lista. Pode tentar de novo?")
-        
-        await update.message.reply_text("O que deseja fazer agora?", reply_markup=MAIN_MENU_KEYBOARD)
-        return
 
     elif text_input == "🗑️ Resetar Dados":
         if EXIBIR_LOGS:
             logging.info("🚀 Acionando fluxo de reset via menu principal...")
         await cmd_resetar(update, context)
+        return
+
+    elif text_input == "📈 Relatório Diário":
+        if EXIBIR_LOGS:
+            logging.info("🚀 Acionando geração de relatório diário com IA via menu...")
+        msg = await update.message.reply_text("A rever as anotações do seu diário hoje... Aguarde um instante! 🧠📊")
+        relatorio = await processar_relatorio_ia(user_id, user_db)
+        await msg.edit_text(relatorio, parse_mode='Markdown')
+        await update.message.reply_text("Deseja fazer mais alguma coisa?", reply_markup=MAIN_MENU_KEYBOARD)
         return
         
     elif text_input == "💡 Sugerir Refeição":
@@ -1542,28 +1530,6 @@ async def handle_weekly_checkin(update: Update, context: ContextTypes.DEFAULT_TY
             
         await context.bot.send_message(chat_id=user_id, text="O que deseja fazer agora?", reply_markup=MAIN_MENU_KEYBOARD)
 
-async def handle_shopping_check(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    await query.answer()
-    
-    keyboard = query.message.reply_markup.inline_keyboard
-    new_keyboard = []
-    
-    for row in keyboard:
-        new_row = []
-        for btn in row:
-            if btn.callback_data == query.data:
-                new_text = btn.text.replace("⬜", "✅") if "⬜" in btn.text else btn.text.replace("✅", "⬜")
-                new_row.append(InlineKeyboardButton(new_text, callback_data=btn.callback_data))
-            else:
-                new_row.append(btn)
-        new_keyboard.append(new_row)
-        
-    try:
-        await query.edit_message_reply_markup(reply_markup=InlineKeyboardMarkup(new_keyboard))
-    except Exception:
-        pass
-
 async def cmd_resetar(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
     if EXIBIR_LOGS:
@@ -1613,6 +1579,59 @@ async def handle_reset_confirmation(update: Update, context: ContextTypes.DEFAUL
             parse_mode='Markdown'
         )
 
+async def processar_relatorio_ia(user_id, user_db):
+    import json
+    try:
+        cal_goal = user_db.get('daily_goal', 0)
+        water_goal = user_db.get('daily_water_goal', 0)
+        goal_type = user_db.get('goal_type', 'manter')
+        api_key = user_db.get('api_key')
+        
+        if not api_key: return "⚠️ A sua chave de API não está configurada."
+        
+        meals = await db.get_meals_today(user_id)
+        water_drunk = await db.get_water_today(user_id)
+        
+        t_cal = sum(m.get('calories', 0) for m in meals)
+        t_prot, t_carb, t_fat, agua_extra = 0, 0, 0, 0
+        
+        for m in meals:
+            if m.get('macros'):
+                try:
+                    mac = json.loads(m['macros'])
+                    t_prot += float(mac.get('protein_g', 0))
+                    t_carb += float(mac.get('carbs_g', 0))
+                    t_fat += float(mac.get('fat_g', 0))
+                except: pass
+            if m.get('micronutrients'):
+                try:
+                    mic = json.loads(m['micronutrients'])
+                    agua_extra += int(mic.get('water_penalty_ml', 0))
+                except: pass
+                
+        water_goal += agua_extra
+        
+        from ai_service import generate_daily_report
+        report = await asyncio.to_thread(generate_daily_report, goal_type, cal_goal, t_cal, round(t_prot,1), round(t_carb,1), round(t_fat,1), water_drunk, water_goal, api_key)
+        return report
+    except Exception as e:
+        if EXIBIR_LOGS: logging.error(f"Erro ao gerar relatório com IA: {e}")
+        return "Desculpe, ocorreu um erro na análise do seu dia. 🤖"
+
+async def auto_daily_report(context: ContextTypes.DEFAULT_TYPE):
+    if EXIBIR_LOGS:
+        logging.info("🚀 Iniciando rotina automática de meia-noite (Relatório Diário com IA)...")
+    users = await db.get_all_users()
+    for user in users:
+        user_id = user['telegram_id']
+        if EXIBIR_LOGS: logging.info(f"A compilar o relatório automático para o utilizador {user_id}...")
+        relatorio = await processar_relatorio_ia(user_id, user)
+        try:
+            await context.bot.send_message(chat_id=user_id, text=f"🌙 *O Seu Relatório Diário*\n\n{relatorio}", parse_mode='Markdown')
+            if EXIBIR_LOGS: logging.info("✅ Relatório de meia-noite entregue com sucesso.")
+        except Exception as e:
+            if EXIBIR_LOGS: logging.error(f"⚠️ Erro ao enviar relatório automático para {user_id}: {e}")
+
 def main():
     # Token from environment
     token = os.environ.get("TELEGRAM_TOKEN")
@@ -1627,6 +1646,10 @@ def main():
     
     # Adicionar loop de alarmes inteligentes (runs every 30 minutes)
     app.job_queue.run_repeating(check_reminders, interval=1800, first=60)
+    
+    # Relatório automático à meia-noite (00:00 SP = 03:00 UTC)
+    import datetime as dt
+    app.job_queue.run_daily(auto_daily_report, time=dt.time(hour=3, minute=0, second=0))
 
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler("start", start), CommandHandler("refazer", redo_profile)],
@@ -1656,7 +1679,6 @@ def main():
     app.add_handler(CommandHandler("desfazer", desfazer_refeicao))
     app.add_handler(CallbackQueryHandler(handle_meal_confirmation, pattern="^(meal_|it_)"))
     app.add_handler(CallbackQueryHandler(handle_weekly_checkin, pattern="^(checkin_|do_phase_)"))
-    app.add_handler(CallbackQueryHandler(handle_shopping_check, pattern="^shop_"))
     app.add_handler(CommandHandler("resetar", cmd_resetar))
     app.add_handler(CallbackQueryHandler(handle_reset_confirmation, pattern="^reset_"))
     
