@@ -427,42 +427,51 @@ Responda EXATAMENTE nesta estrutura:
             if EXIBIR_LOGS: print(f"⚠️ Erro ao analisar rótulo após {max_retries} tentativas: {error_msg}")
             return "Os servidores da inteligência artificial estão enfrentando um congestionamento enorme agora e não consegui ler esse rótulo. Pode tentar de novo em uns 2 minutinhos?"
 
-def generate_shopping_list(goal_type, api_key=None):
+def generate_daily_report(goal_type, cal_goal, t_cal, t_prot, t_carb, t_fat, water_drunk, water_goal, api_key=None):
     if EXIBIR_LOGS:
-        print(f"🛒 Iniciando a montagem da lista de compras para o objetivo: {goal_type}...")
+        print("🚀 Gerando relatório diário analítico com IA...")
         
     client = genai.Client(api_key=api_key) if api_key else genai.Client()
     
     prompt = f"""
-Você é um nutricionista esportivo montando uma lista de supermercado para um paciente focado em {goal_type}.
-A lista deve refletir produtos fáceis de achar, baratos e condizentes com a realidade de supermercados regionais do interior de Minas Gerais.
-Priorize itens acessíveis e práticos para quem tem rotina de treino pesado. Nada de itens gourmet, caros ou importados.
+Aja como um nutricionista clínico altamente analítico e encorajador.
+Faça uma avaliação do dia de hoje do seu paciente antes de ele ir dormir.
 
-Retorne APENAS um JSON válido contendo uma lista de strings chamada 'items'. 
-Exemplo de formato:
-{{
-  "items": ["Ovo (cartela com 30)", "Peito de Frango", "Aveia em flocos", "Feijão carioca", "Banana prata"]
-}}
+DADOS DO PACIENTE HOJE:
+- Objetivo: {goal_type}
+- Meta Diária de Calorias: {cal_goal} kcal
+- Consumo Realizado: {t_cal} kcal
+- Divisão de Macros: Proteínas ({t_prot}g), Carboidratos ({t_carb}g), Gorduras ({t_fat}g)
+- Hidratação: {water_drunk}ml ingeridos de uma meta de {water_goal}ml.
+
+INSTRUÇÕES DE RESPOSTA:
+1. Inicie com um cumprimento caloroso de fim de dia.
+2. Avalie de forma direta o saldo calórico (se cumpriu o déficit/superávit planeado ou se sabotou o processo).
+3. Analise rapidamente se a proteína foi suficiente para manter a massa magra e o equilíbrio dos outros macros.
+4. Comente sobre a hidratação.
+5. Finalize com um conselho prático ou uma palavra de motivação para amanhã.
+
+Seja natural, não use jargões robóticos e insira alguns emojis. O texto deve ser curto e estruturado em Markdown.
 """
     max_retries = len(MODELOS_CASCATA)
     for attempt in range(max_retries):
         model_id = MODELOS_CASCATA[attempt]
         try:
-            response = client.models.generate_content(model=model_id, contents=[prompt])
-            text = response.text.strip()
-            match = re.search(r'\{.*\}', text, re.DOTALL)
-            if match:
-                data = json.loads(match.group(0))
-                if EXIBIR_LOGS: print(f"✅ Lista gerada com {len(data.get('items', []))} itens usando {model_id}.")
-                return data
-            return {"items": ["Ovos", "Frango", "Arroz", "Vegetais"]}
+            response = client.models.generate_content(
+                model=model_id,
+                contents=[prompt]
+            )
+            if EXIBIR_LOGS:
+                print(f"✅ Relatório diário gerado com sucesso usando {model_id}!")
+            return response.text.strip()
         except Exception as e:
             error_msg = str(e)
             if ("429" in error_msg or "503" in error_msg or "RESOURCE_EXHAUSTED" in error_msg or "UNAVAILABLE" in error_msg) and attempt < max_retries - 1:
                 if EXIBIR_LOGS:
-                    print(f"⚠️ Modelo {model_id} esgotado ou indisponível. 🔄 Acionando modelo secundário {MODELOS_CASCATA[attempt+1]}...")
+                    print(f"⚠️ Modelo {model_id} esgotado. 🔄 Tentando {MODELOS_CASCATA[attempt+1]}...")
                 time.sleep(2)
                 continue
                 
-            if EXIBIR_LOGS: print(f"⚠️ Erro ao gerar lista após {max_retries} tentativas: {error_msg}")
-            return {"items": ["Ovos", "Frango", "Arroz", "Vegetais"]}
+            if EXIBIR_LOGS:
+                print(f"⚠️ Erro ao gerar relatório após {max_retries} tentativas: {error_msg}")
+            return "Tive um problema de comunicação com os servidores do Google para gerar a avaliação de hoje. Tente novamente amanhã!"
