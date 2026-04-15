@@ -61,12 +61,38 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         await db.save_user(user.id, {"step": "GENDER"})
         return GENDER
         
-    await update.message.reply_text(
-        "Olá! Sou o seu Nutricionista Virtual de bolso. 🥗🤖\n"
-        "Para eu poder te ajudar e garantir que seus dados sejam processados de forma privada, preciso da sua Chave de API do Google Gemini.\n\n"
-        "🔑 Por favor, cole a sua chave de API abaixo:"
+    if EXIBIR_LOGS:
+        logging.info(f"🚀 Iniciando boas-vindas e enviando tutorial BYOK para o utilizador {user.id}...")
+        
+    tutorial_text = (
+        "Olá! Criei este Nutricionista Virtual para nos ajudar a controlar a alimentação e bater os macros de uma forma muito mais simples. 🥗🤖\n\n"
+        "A inteligência artificial exige bastante processamento. Por isso, criei uma arquitetura descentralizada para garantir que o projeto se mantém 100% gratuito. "
+        "Na prática, cada pessoa vai utilizar a sua própria quota gratuita do Google para dar vida ao robô.\n\n"
+        "📋 *Passo a passo rápido:*\n"
+        "1. Aceda ao Google AI Studio (aistudio.google.com) e faça o login com a sua conta normal do Google.\n"
+        "2. No menu lateral, clique em *Get API key* e, em seguida, no botão azul *Create API key*. O sistema vai gerar um código longo. Copie-o.\n"
+        "3. Volte a esta conversa e envie-me esse código para desbloquearmos as funções visuais do assistente!"
     )
+    
+    keyboard = [[InlineKeyboardButton("✅ Entendi, quero configurar!", callback_data="tutorial_ok")]]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    
+    await update.message.reply_text(tutorial_text, parse_mode='Markdown', reply_markup=reply_markup)
     await db.save_user(user.id, {"name": user.first_name, "step": "API_KEY"})
+    return API_KEY
+
+async def ask_for_api_key(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    query = update.callback_query
+    await query.answer()
+    user_id = query.from_user.id
+    
+    if EXIBIR_LOGS:
+        logging.info(f"✅ Utilizador {user_id} confirmou leitura do tutorial. Solicitando a chave de API...")
+        
+    await query.edit_message_text(
+        "Maravilha! 🚀\n\n"
+        "🔑 Por favor, cole a sua chave de API do Google Gemini abaixo:"
+    )
     return API_KEY
 
 async def receive_api_key(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -1542,7 +1568,10 @@ def main():
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler("start", start), CommandHandler("refazer", redo_profile)],
         states={
-            API_KEY: [MessageHandler(filters.TEXT & ~filters.COMMAND, receive_api_key)],
+            API_KEY: [
+                CallbackQueryHandler(ask_for_api_key, pattern="^tutorial_ok$"),
+                MessageHandler(filters.TEXT & ~filters.COMMAND, receive_api_key)
+            ],
             GENDER: [MessageHandler(filters.TEXT & ~filters.COMMAND, gender)],
             AGE: [MessageHandler(filters.TEXT & ~filters.COMMAND, age)],
             WEIGHT: [MessageHandler(filters.TEXT & ~filters.COMMAND, weight)],
