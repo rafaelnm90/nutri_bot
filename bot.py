@@ -638,6 +638,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         t_carb = sum(float((it.get('macros') or {}).get('carbs_g') or 0) for it in items)
         t_fat = sum(float((it.get('macros') or {}).get('fat_g') or 0) for it in items)
         t_sugar = sum(float((it.get('macros') or {}).get('sugar_g') or 0) for it in items)
+        t_fiber = sum(float((it.get('macros') or {}).get('fiber_g') or 0) for it in items)
 
         t_na = sum(float((it.get('micronutrients') or {}).get('sodium_mg') or 0) for it in items)
         t_ca = sum(float((it.get('micronutrients') or {}).get('calcium_mg') or 0) for it in items)
@@ -690,6 +691,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"🍞 Carbs: {t_carb:.1f}g\n"
             f"🥑 Gorduras: {t_fat:.1f}g\n"
             f"🍬 Açúcar: {t_sugar:.1f}g\n"
+            f"🌾 Fibras: {t_fiber:.1f}g\n"
             f"{micros_text}\n"
             f"_Deseja confirmar o registro total ou ajustar os itens individualmente?_"
         )
@@ -751,6 +753,7 @@ async def handle_meal_confirmation(update: Update, context: ContextTypes.DEFAULT
             t_carb = sum(float((it.get('macros') or {}).get('carbs_g') or 0) for it in items)
             t_fat = sum(float((it.get('macros') or {}).get('fat_g') or 0) for it in items)
             t_sugar = sum(float((it.get('macros') or {}).get('sugar_g') or 0) for it in items)
+            t_fiber = sum(float((it.get('macros') or {}).get('fiber_g') or 0) for it in items)
             
             t_na = sum(float((it.get('micronutrients') or {}).get('sodium_mg') or 0) for it in items)
             t_ca = sum(float((it.get('micronutrients') or {}).get('calcium_mg') or 0) for it in items)
@@ -801,6 +804,7 @@ async def handle_meal_confirmation(update: Update, context: ContextTypes.DEFAULT
                 f"🍞 Carbs: {t_carb:.1f}g\n"
                 f"🥑 Gorduras: {t_fat:.1f}g\n"
                 f"🍬 Açúcar: {t_sugar:.1f}g\n"
+                f"🌾 Fibras: {t_fiber:.1f}g\n"
                 f"{micros_text}"
             )
             
@@ -953,6 +957,7 @@ async def handle_meal_confirmation(update: Update, context: ContextTypes.DEFAULT
         t_carb = sum(float((it.get('macros') or {}).get('carbs_g') or 0) for it in items)
         t_fat = sum(float((it.get('macros') or {}).get('fat_g') or 0) for it in items)
         t_sugar = sum(float((it.get('macros') or {}).get('sugar_g') or 0) for it in items)
+        t_fiber = sum(float((it.get('macros') or {}).get('fiber_g') or 0) for it in items)
 
         t_na = sum(float((it.get('micronutrients') or {}).get('sodium_mg') or 0) for it in items)
         t_ca = sum(float((it.get('micronutrients') or {}).get('calcium_mg') or 0) for it in items)
@@ -1005,6 +1010,7 @@ async def handle_meal_confirmation(update: Update, context: ContextTypes.DEFAULT
             f"🍞 Carbs: {t_carb:.1f}g\n"
             f"🥑 Gorduras: {t_fat:.1f}g\n"
             f"🍬 Açúcar: {t_sugar:.1f}g\n"
+            f"🌾 Fibras: {t_fiber:.1f}g\n"
             f"{micros_text}\n"
             f"_Deseja confirmar o registro total ou ajustar os itens individualmente?_"
         )
