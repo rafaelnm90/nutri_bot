@@ -37,7 +37,8 @@ MAIN_MENU_KEYBOARD = ReplyKeyboardMarkup(
     [
         ['📊 Meu Resumo de Hoje', '💧 Registrar Água'],
         ['💡 Sugerir Refeição', '🍽️ Registrar Comida'],
-        ['🛒 Ler Rótulo', '📋 Lista de Compras']
+        ['🛒 Ler Rótulo', '📋 Lista de Compras'],
+        ['🗑️ Resetar Dados']
     ],
     resize_keyboard=True
 )
@@ -333,7 +334,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     photo_file = None
     text_input = update.message.text or ""
     
-    if text_input in ["📊 Meu Resumo de Hoje", "💧 Registrar Água", "🍽️ Registrar Comida", "💡 Sugerir Refeição", "🏋️ Registrar Exercício", "🛒 Ler Rótulo", "📋 Lista de Compras"]:
+    if text_input in ["📊 Meu Resumo de Hoje", "💧 Registrar Água", "🍽️ Registrar Comida", "💡 Sugerir Refeição", "🏋️ Registrar Exercício", "🛒 Ler Rótulo", "📋 Lista de Compras", "🗑️ Resetar Dados"]:
         if EXIBIR_LOGS:
             logging.info("🧹 Limpando estados temporários de edição para nova navegação...")
         context.user_data.pop('editing_index', None)
@@ -380,6 +381,13 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         await update.message.reply_text("O que deseja fazer agora?", reply_markup=MAIN_MENU_KEYBOARD)
         return
+
+    elif text_input == "🗑️ Resetar Dados":
+        if EXIBIR_LOGS:
+            logging.info("🚀 Acionando fluxo de reset via menu principal...")
+        await cmd_resetar(update, context)
+        return
+        
     elif text_input == "💡 Sugerir Refeição":
         await db.save_user(user_id, {"step": "DONE"})
         
