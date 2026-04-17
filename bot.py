@@ -367,12 +367,17 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await cmd_resetar(update, context)
         return
 
-    elif text_input == "📈 Relatório Diário":
+    elif text_input == "📈 Relatório com IA":
         if EXIBIR_LOGS:
             logging.info("🚀 Acionando geração de relatório diário com IA via menu...")
         msg = await update.message.reply_text("A rever as anotações do seu diário hoje... Aguarde um instante! 🧠📊")
         relatorio = await processar_relatorio_ia(user_id, user_db)
-        await msg.edit_text(relatorio, parse_mode='Markdown')
+        try:
+            await msg.edit_text(relatorio, parse_mode='Markdown')
+        except Exception as e:
+            if EXIBIR_LOGS:
+                logging.warning(f"⚠️ Erro de formatação Markdown detectado no relatório ({e}). Enviando texto limpo...")
+            await msg.edit_text(relatorio)
         await update.message.reply_text("Deseja fazer mais alguma coisa?", reply_markup=MAIN_MENU_KEYBOARD)
         return
         
@@ -1653,9 +1658,9 @@ def main():
     # Adicionar loop de alarmes inteligentes (runs every 30 minutes)
     app.job_queue.run_repeating(check_reminders, interval=1800, first=60)
     
-    # Relatório automático à meia-noite (00:00 SP = 03:00 UTC)
+    # Relatório automático às 23:30 SP (02:30 UTC)
     import datetime as dt
-    app.job_queue.run_daily(auto_daily_report, time=dt.time(hour=3, minute=0, second=0))
+    app.job_queue.run_daily(auto_daily_report, time=dt.time(hour=2, minute=30, second=0))
 
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler("start", start), CommandHandler("refazer", redo_profile)],
