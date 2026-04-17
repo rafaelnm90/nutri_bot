@@ -451,7 +451,7 @@ INSTRUÇÕES DE RESPOSTA:
 4. Comente sobre a hidratação.
 5. Finalize com um conselho prático ou uma palavra de motivação para amanhã.
 
-Seja natural, não use jargões robóticos e insira alguns emojis. O texto deve ser curto e estruturado em Markdown.
+Não utilize blocos de código markdown (como ```json ou crases). Responda em formato de texto Markdown amigável e perfeitamente validado para a API legada do Telegram (feche rigorosamente todos os asteriscos simples * para negrito e sublinhados). É estritamente proibido usar asteriscos duplos (**). Seja natural, evite jargões robóticos e insira alguns emojis.
 """
     max_retries = len(MODELOS_CASCATA)
     for attempt in range(max_retries):
