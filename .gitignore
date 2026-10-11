@@ -1,0 +1,12 @@
+.gradle/
+build/
+local.properties
+.idea/
+*.iml
+.DS_Store
+captures/
+.kotlin/
+__pycache__/
+*.pyc
+# A chave de assinatura fica nos segredos do GitHub, nunca no repositório.
+*.jks
