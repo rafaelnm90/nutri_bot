@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Só o fundo da janela antes do Compose desenhar; as cores do app ficam no Tema.kt. -->
+    <!-- Só o fundo da janela antes do Compose desenhar; as cores do app ficam no MainActivity.kt. -->
     <style name="Tema.Calorias" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:windowBackground">@color/fundo</item>
         <item name="android:statusBarColor">@color/fundo</item>
