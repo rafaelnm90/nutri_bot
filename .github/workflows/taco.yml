@@ -1,0 +1,43 @@
+# Baixa a tabela TACO oficial (NEPA/UNICAMP), gera o assets/taco.json e grava
+# no branch "taco-dados", de onde ele entra no app por um PR. Roda quando o
+# script muda na main, ou à mão (sempre na main: o taco-dados nasce do branch
+# em que roda).
+name: TACO
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ferramentas/gerar_taco.py
+      - .github/workflows/taco.yml
+
+permissions:
+  contents: write
+
+jobs:
+  taco:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependências
+        run: pip install pandas xlrd openpyxl requests
+
+      - name: Gerar taco.json
+        run: python ferramentas/gerar_taco.py app/src/main/assets/taco.json
+
+      - name: Gravar no branch taco-dados
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B taco-dados
+          git add app/src/main/assets/taco.json
+          if git diff --cached --quiet; then echo "taco.json sem mudança"; exit 0; fi
+          git commit -m "assets: tabela TACO gerada pelo workflow TACO"
+          git push -f origin taco-dados
