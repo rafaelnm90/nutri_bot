@@ -93,6 +93,9 @@ fun App() {
     // Saveable: girar o celular ou o Android fechar o app com a câmera aberta não
     // pode tirar a pessoa da tela de adicionar (a foto chega nela).
     var adicionandoEm by rememberSaveable { mutableStateOf<Refeicao?>(null) }
+    // O dia da adição fica preso ao abrir a tela: a volta da câmera depois da meia-noite
+    // pode trocar o dia do Diário, mas a comida vai para o dia em que a pessoa tocou em +.
+    var diaDaAdicao by rememberSaveable { mutableStateOf(dia) }
 
     // Voltou ao app num dia novo: quem estava vendo "hoje" passa para o dia novo,
     // senão a comida seria gravada no dia de ontem.
@@ -120,7 +123,7 @@ fun App() {
     val refeicao = adicionandoEm
     if (refeicao != null) {
         BackHandler { adicionandoEm = null }
-        AdicionarTela(dia = dia, refeicao = refeicao, aoVoltar = { adicionandoEm = null })
+        AdicionarTela(dia = diaDaAdicao, refeicao = refeicao, aoVoltar = { adicionandoEm = null })
         return
     }
 
@@ -152,7 +155,10 @@ fun App() {
                 Aba.DIARIO -> DiarioTela(
                     dia = dia,
                     aoMudarDia = { dia = it },
-                    aoAdicionar = { adicionandoEm = it },
+                    aoAdicionar = {
+                        diaDaAdicao = dia
+                        adicionandoEm = it
+                    },
                     aoAbrirAjustes = { aba = Aba.AJUSTES },
                 )
                 Aba.PESO -> PesoTela()
