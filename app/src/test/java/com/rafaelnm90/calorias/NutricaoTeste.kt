@@ -69,6 +69,17 @@ class NutricaoTeste {
     }
 
     @Test
+    fun abaixoDaFaixaHojeEsperaENosOutrosDiasErra() {
+        val f = Faixa(1900.0, 2100.0)
+        assertEquals("⏳", sinalDaFaixa(1500.0, f, diaEmCurso = true))
+        assertEquals("❌", sinalDaFaixa(1500.0, f, diaEmCurso = false))
+        assertEquals("✅", sinalDaFaixa(2000.0, f, diaEmCurso = true))
+        assertEquals("✅", sinalDaFaixa(2000.0, f, diaEmCurso = false))
+        assertEquals("❌", sinalDaFaixa(2200.0, f, diaEmCurso = true))
+        assertEquals("❌", sinalDaFaixa(2200.0, f, diaEmCurso = false))
+    }
+
+    @Test
     fun macrosDivididos30_40_30ComFaixa() {
         val m = Calculos.metaMacros(2000)
         assertEquals(150.0, m.prot, 0.01)

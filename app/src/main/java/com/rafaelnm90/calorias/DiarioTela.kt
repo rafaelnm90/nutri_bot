@@ -198,7 +198,7 @@ fun DiarioTela(
         if (ehHoje && CheckIn.pendente(perfil, LocalDate.now())) {
             item { CheckInCartao(perfil.fase) { fase -> ajustes.concluirCheckIn(fase) } }
         }
-        item { Resumo(total, metaKcal, meta, gastas) }
+        item { Resumo(total, metaKcal, meta, gastas, ehHoje) }
         item { NutrientesCartao(micros, MetasNutrientes.de(perfil, ano)) }
         if (ehHoje) {
             item {
@@ -366,7 +366,7 @@ private fun CheckInCartao(fase: Fase, aoEscolherFase: (Fase) -> Unit) {
 }
 
 @Composable
-private fun Resumo(total: Macros, metaKcal: Int, meta: Macros, gastas: Int) {
+private fun Resumo(total: Macros, metaKcal: Int, meta: Macros, gastas: Int, ehHoje: Boolean) {
     val restantes = metaKcal - total.kcal
     val faixa = Calculos.faixaKcal(metaKcal)
     Cartao {
@@ -397,16 +397,14 @@ private fun Resumo(total: Macros, metaKcal: Int, meta: Macros, gastas: Int) {
             Numero(inteiro(gastas.toDouble()), "Gastas")
         }
         Spacer(Modifier.height(8.dp))
-        val (icone, frase, cor) = when {
+        val icone = sinalDaFaixa(total.kcal, faixa, diaEmCurso = ehHoje)
+        val (frase, cor) = when {
             total.kcal > faixa.max ->
-                Triple("❌", "Acima da faixa: passou ${inteiro(total.kcal - faixa.max)} kcal do teto.", MaterialTheme.colorScheme.error)
+                "Acima da faixa: passou ${inteiro(total.kcal - faixa.max)} kcal do teto." to MaterialTheme.colorScheme.error
             total.kcal < faixa.min ->
-                Triple(
-                    "❌",
-                    "Faltam pelo menos ${inteiro(faixa.min - total.kcal)} kcal para entrar na faixa.",
-                    MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            else -> Triple("✅", "Na faixa ideal! Excelente controle.", COR_OK)
+                "Faltam pelo menos ${inteiro(faixa.min - total.kcal)} kcal para entrar na faixa." to
+                    MaterialTheme.colorScheme.onSurfaceVariant
+            else -> "Na faixa ideal! Excelente controle." to COR_OK
         }
         Text(
             "🎯 Faixa do dia: ${inteiro(faixa.min)} a ${inteiro(faixa.max)} kcal (meta ${inteiro(metaKcal.toDouble())})",

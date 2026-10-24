@@ -175,6 +175,16 @@ data class Faixa(val min: Double, val max: Double) {
     operator fun contains(valor: Double) = valor >= min && valor <= max
 }
 
+/**
+ * Sinal das calorias do dia: ✅ na faixa e ❌ acima dela. Abaixo, ⏳ enquanto o
+ * dia não acabou (ainda dá tempo de comer) e ❌ nos dias que já passaram.
+ */
+fun sinalDaFaixa(valor: Double, faixa: Faixa, diaEmCurso: Boolean): String = when {
+    valor in faixa -> "✅"
+    valor < faixa.min && diaEmCurso -> "⏳"
+    else -> "❌"
+}
+
 object Calculos {
     private const val META_SEM_PERFIL = 2000
     private const val AGUA_SEM_PERFIL = 2000
