@@ -226,7 +226,19 @@ fun AdicionarTela(dia: String, refeicao: Refeicao, aoVoltar: () -> Unit) {
         contentWindowInsets = WindowInsets.safeDrawing,
         topBar = {
             TopAppBar(
-                title = { Text("Adicionar ao ${refeicao.titulo}") },
+                title = {
+                    // Fora de hoje, o dia aparece embaixo: é nele que a comida entra.
+                    Column {
+                        Text("Adicionar ao ${refeicao.titulo}", maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        if (dia != hoje()) {
+                            Text(
+                                tituloDoDia(dia),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.primary,
+                            )
+                        }
+                    }
+                },
                 navigationIcon = {
                     IconButton(onClick = aoVoltar) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Voltar")
