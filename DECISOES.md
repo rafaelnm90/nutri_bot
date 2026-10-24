@@ -35,7 +35,8 @@ riscar o antigo com "substituída em DD/MM/AAAA" e registrar o novo abaixo.
 
 - Gasto do dia pela fórmula de Mifflin-St Jeor (o nutri_bot usa Harris-Benedict; o Rafael preferiu a Mifflin), vezes o fator de atividade (1,2 / 1,375 / 1,55 / 1,725, iguais aos do bot).
 - Macros: 30% proteína, 40% carboidrato, 30% gordura, cada um com faixa (proteína ±15 g, carboidrato ±20 g, gordura ±10 g).
-- Calorias como faixa: meta ±100 kcal, nunca abaixo de 1.200 (meta à mão abaixo de 1.100: a faixa vira o próprio piso); ✅ dentro, ❌ fora, também no dia em curso, como no bot. O mínimo da meta continua 1.500 (homem) e 1.200 (mulher).
+- ~~Calorias como faixa: meta ±100 kcal, nunca abaixo de 1.200 (meta à mão abaixo de 1.100: a faixa vira o próprio piso); ✅ dentro, ❌ fora, também no dia em curso, como no bot.~~ (substituída em 11/10/2026) O mínimo da meta continua 1.500 (homem) e 1.200 (mulher).
+- 11/10/2026: calorias como faixa: meta ±100 kcal, nunca abaixo de 1.200. Quando o piso corta a faixa, ela fica com os 200 kcal de largura a partir dele (resposta do Rafael para meta à mão abaixo de 1.100: "1.200 a 1.400"; vale até a meta 1.300, onde as duas contas se encontram).
 - 11/10/2026: na tela de adicionar comida, quando o dia não é hoje, o dia aparece embaixo do título ("Ontem", "Sex, 09/10"), para não lançar no dia errado sem perceber. A comida vai para o dia em que a pessoa tocou em ＋, mesmo que a meia-noite passe no meio.
 - Água: 35 ml por kg (meta à mão opcional). Bebida alcoólica ou refrigerante (mesmo zero) soma o mesmo volume na meta do dia.
 - Fases (no lugar do ritmo em kg por semana): Fase 1 Adaptação ±200 kcal, Fase 2 Ideal ±400 (a recomendada), Fase 3 Drástica ±600 (aviso: não usar por mais de 2 semanas). Quem está começando, Fase 1; quem tem experiência, Fase 2.

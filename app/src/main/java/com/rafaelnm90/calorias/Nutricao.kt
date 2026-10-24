@@ -210,8 +210,9 @@ object Calculos {
      */
     fun faixaKcal(meta: Int): Faixa {
         val piso = max(1200.0, meta - 100.0)
-        // Meta à mão abaixo de 1.100: a faixa vira o próprio piso, nunca invertida.
-        return Faixa(piso, max(piso, meta + 100.0))
+        // Quando o piso de 1.200 corta a faixa (meta abaixo de 1.300), ela continua
+        // com os 200 kcal de largura a partir dele: meta 1.000 dá 1.200 a 1.400.
+        return Faixa(piso, max(meta + 100.0, piso + 200.0))
     }
 
     /** Divisão do nutri_bot: 30% proteína, 40% carboidrato e 30% gordura. */

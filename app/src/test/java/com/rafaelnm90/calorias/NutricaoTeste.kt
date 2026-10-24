@@ -52,16 +52,20 @@ class NutricaoTeste {
     @Test
     fun faixaDeCemKcalNuncaAbaixoDe1200() {
         assertEquals(Faixa(1900.0, 2100.0), Calculos.faixaKcal(2000))
-        assertEquals(Faixa(1200.0, 1350.0), Calculos.faixaKcal(1250))
+        assertEquals(Faixa(1200.0, 1400.0), Calculos.faixaKcal(1250))
         assertTrue(1950.0 in Calculos.faixaKcal(2000))
         assertFalse(2101.0 in Calculos.faixaKcal(2000))
     }
 
     @Test
-    fun faixaNuncaInverteComMetaBaixa() {
-        val f = Calculos.faixaKcal(1000)
-        assertTrue(f.min <= f.max)
-        assertEquals(Faixa(1200.0, 1200.0), f)
+    fun faixaComMetaBaixaFicaCom200KcalAPartirDoPiso() {
+        // Escolha do Rafael: meta à mão abaixo do piso dá 1.200 a 1.400.
+        assertEquals(Faixa(1200.0, 1400.0), Calculos.faixaKcal(1000))
+        assertEquals(Faixa(1200.0, 1400.0), Calculos.faixaKcal(1100))
+        assertEquals(Faixa(1200.0, 1400.0), Calculos.faixaKcal(1200))
+        assertEquals(Faixa(1200.0, 1400.0), Calculos.faixaKcal(1300))
+        assertEquals(Faixa(1300.0, 1500.0), Calculos.faixaKcal(1400))
+        assertTrue(1300.0 in Calculos.faixaKcal(1000))
     }
 
     @Test
