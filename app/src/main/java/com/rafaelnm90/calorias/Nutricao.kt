@@ -420,11 +420,18 @@ object Bebidas {
     private val PALAVRAS = listOf(
         "cerveja", "chope", "chopp", "vinho", "espumante", "champanhe", "cachaca", "caipirinha",
         "caipiroska", "vodka", "whisky", "uisque", "gin", "rum", "tequila", "licor", "conhaque",
-        "sake", "drink", "refrigerante", "coca", "pepsi", "fanta", "sprite", "soda", "tonica",
+        "sake", "drink", "batida", "refrigerante", "coca", "pepsi", "fanta", "sprite", "soda", "tonica",
+        "guarana", "aguardente", "mojito", "mule", "cuba", "negroni", "aperol", "spritz", "sangria", "quentao",
+        "daiquiri",
     )
 
     /** Comidas que levam bebida no preparo ou no nome: não pedem água. */
-    private val PREPAROS = listOf("molho", "vinagre", "xarope", "bolo", "sorvete", "calda", "bicarbonato")
+    private val PREPAROS = listOf(
+        "molho", "vinagre", "xarope", "bolo", "sorvete", "calda", "bicarbonato", "pao", "bala",
+    )
+
+    /** "Frango ao vinho", "Costela na cerveja": a bebida depois destas palavras tempera o prato. */
+    private val LIGACOES = setOf("ao", "aos", "a", "as", "na", "nas", "no", "nos", "com", "em")
 
     /** Outras bebidas: a quantidade aparece em ml. */
     private val OUTRAS_BEBIDAS = listOf(
@@ -441,12 +448,20 @@ object Bebidas {
     /** Pelo nome, se a bebida faz o dia pedir mais água (regra do nutri_bot). */
     fun pedeAgua(nome: String): Boolean {
         val doNome = Busca.palavras(nome)
-        // "Guaraná em pó", cocada e "frango ao molho de vinho" não são bebida.
+        // "Guaraná em pó", cocada, "xarope de guaraná" e "frango ao molho de vinho" não são bebida.
         if ("po" in doNome || doNome.any { it.startsWith("cocad") || it in PREPAROS }) return false
-        // Guaraná só como a bebida ("Guaraná Antarctica"); "xarope de guaraná" não é refrigerante.
-        if (doNome.firstOrNull() == "guarana" || "refri" in doNome) return true
-        return PALAVRAS.any { p -> doNome.any { it == p || (p.length >= 5 && it.startsWith(p)) } }
+        // Nome que começa por bebida ("Suco com vodka", "Gin com tônica") é bebida inteiro;
+        // nos outros, a bebida logo depois de "ao", "na", "com"... é do preparo.
+        val primeira = doNome.firstOrNull() ?: return false
+        val comecaPorBebida = ehAlcoolOuRefri(primeira) || primeira in OUTRAS_BEBIDAS
+        return doNome.indices.any { i ->
+            ehAlcoolOuRefri(doNome[i]) && (comecaPorBebida || i == 0 || doNome[i - 1] !in LIGACOES)
+        }
     }
+
+    // "refri" só como palavra inteira, para "refrito" não contar.
+    private fun ehAlcoolOuRefri(palavra: String) =
+        palavra == "refri" || PALAVRAS.any { p -> palavra == p || (p.length >= 5 && palavra.startsWith(p)) }
 }
 
 /** Alimento criado à mão com os valores do rótulo (100 g); a regra da água vem do nome. */

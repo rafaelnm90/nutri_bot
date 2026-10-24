@@ -195,6 +195,18 @@ class NutricaoTeste {
         assertFalse(Bebidas.pedeAgua("Arroz, tipo 1, cozido"))
         assertTrue(Bebidas.pedeAgua("Guaraná Antarctica"))
         assertTrue(Bebidas.pedeAgua("Refri zero"))
+        assertTrue(Bebidas.pedeAgua("Lata de guaraná"))
+        assertTrue(Bebidas.pedeAgua("Kuat guaraná"))
+        assertTrue(Bebidas.pedeAgua("Taça de vinho"))
+        assertTrue(Bebidas.pedeAgua("Gin com tônica"))
+        assertTrue(Bebidas.pedeAgua("Suco com vodka"))
+        assertTrue(Bebidas.pedeAgua("Batida de coco com cachaça"))
+        // Drinks com o nome próprio na frente e a cachaça da TACO.
+        assertTrue(Bebidas.pedeAgua("Mojito com rum"))
+        assertTrue(Bebidas.pedeAgua("Moscow mule com vodka"))
+        assertTrue(Bebidas.pedeAgua("Cuba libre"))
+        assertTrue(Bebidas.pedeAgua("Cana, aguardente 1"))
+        assertFalse(Bebidas.pedeAgua("Sanduíche cubano"))
     }
 
     @Test
@@ -203,6 +215,12 @@ class NutricaoTeste {
         assertFalse(Bebidas.pedeAgua("Feijão refrito"))
         assertFalse(Bebidas.pedeAgua("Frango ao molho de vinho"))
         assertFalse(Bebidas.pedeAgua("Bolo de cerveja preta"))
+        assertFalse(Bebidas.pedeAgua("Costela na cerveja"))
+        assertFalse(Bebidas.pedeAgua("Strogonoff com conhaque"))
+        assertFalse(Bebidas.pedeAgua("Peixe ao vinho branco"))
+        assertFalse(Bebidas.pedeAgua("Camarão na cachaça"))
+        assertFalse(Bebidas.pedeAgua("Pão de cerveja"))
+        assertFalse(Bebidas.pedeAgua("Bala de guaraná"))
     }
 
     @Test
@@ -220,6 +238,9 @@ class NutricaoTeste {
         assertEquals(ORIGEM_MEU, ipa.origem)
         assertEquals("789", ipa.codigoBarras)
         assertFalse(alimentoFeitoAMao("Granola", 400.0, 10.0, 60.0, 12.0, null, null).pedeAgua)
+        // Prato com bebida no nome não soma na água.
+        assertFalse(alimentoFeitoAMao("Frango ao vinho", 180.0, 20.0, 2.0, 9.0, null, null).pedeAgua)
+        assertFalse(alimentoFeitoAMao("Costela na cerveja", 300.0, 25.0, 3.0, 20.0, null, null).pedeAgua)
     }
 
     @Test
