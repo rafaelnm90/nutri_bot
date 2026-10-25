@@ -1,6 +1,8 @@
 name: Deploy NutriBot
 
 on:
+  # À mão: como mudança só neste arquivo não dispara o deploy, ele roda por aqui.
+  workflow_dispatch:
   push:
     branches:
       - main
