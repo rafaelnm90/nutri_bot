@@ -431,7 +431,7 @@ object Bebidas {
     private val PALAVRAS = listOf(
         "cerveja", "chope", "chopp", "vinho", "espumante", "champanhe", "cachaca", "caipirinha",
         "caipiroska", "vodka", "whisky", "uisque", "gin", "rum", "tequila", "licor", "conhaque",
-        "sake", "drink", "batida", "refrigerante", "coca", "pepsi", "fanta", "sprite", "soda", "tonica",
+        "sake", "drink", "refrigerante", "coca", "pepsi", "fanta", "sprite", "soda", "tonica",
         "guarana", "aguardente", "mojito", "mule", "cuba", "negroni", "aperol", "spritz", "sangria", "quentao",
         "daiquiri",
     )
@@ -441,8 +441,11 @@ object Bebidas {
         "molho", "vinagre", "xarope", "bolo", "sorvete", "calda", "bicarbonato", "pao", "bala",
     )
 
-    /** "Frango ao vinho", "Costela na cerveja": a bebida depois destas palavras tempera o prato. */
-    private val LIGACOES = setOf("ao", "aos", "a", "as", "na", "nas", "no", "nos", "com", "em")
+    /**
+     * "Frango ao vinho", "Costela na cerveja": a bebida depois destas palavras tempera o
+     * prato. "com" fica de fora porque é o jeito de escrever drink ("Limonada com vodka").
+     */
+    private val LIGACOES = setOf("ao", "aos", "a", "as", "na", "nas", "no", "nos", "em")
 
     /** Outras bebidas: a quantidade aparece em ml. */
     private val OUTRAS_BEBIDAS = listOf(
@@ -461,9 +464,11 @@ object Bebidas {
         val doNome = Busca.palavras(nome)
         // "Guaraná em pó", cocada, "xarope de guaraná" e "frango ao molho de vinho" não são bebida.
         if ("po" in doNome || doNome.any { it.startsWith("cocad") || it in PREPAROS }) return false
-        // Nome que começa por bebida ("Suco com vodka", "Gin com tônica") é bebida inteiro;
-        // nos outros, a bebida logo depois de "ao", "na", "com"... é do preparo.
+        // Nome que começa por bebida é bebida inteiro; nos outros, a bebida logo
+        // depois de "ao", "na", "no"... é do preparo ("Frango ao vinho").
         val primeira = doNome.firstOrNull() ?: return false
+        // "Batida de coco" é o drink; "banana batida com leite" é vitamina.
+        if (primeira == "batida") return true
         val comecaPorBebida = ehAlcoolOuRefri(primeira) || primeira in OUTRAS_BEBIDAS
         return doNome.indices.any { i ->
             ehAlcoolOuRefri(doNome[i]) && (comecaPorBebida || i == 0 || doNome[i - 1] !in LIGACOES)

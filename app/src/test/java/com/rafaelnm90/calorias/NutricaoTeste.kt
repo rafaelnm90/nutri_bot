@@ -222,6 +222,12 @@ class NutricaoTeste {
         assertTrue(Bebidas.pedeAgua("Cuba libre"))
         assertTrue(Bebidas.pedeAgua("Cana, aguardente 1"))
         assertFalse(Bebidas.pedeAgua("Sanduíche cubano"))
+        // Drink escrito com "com": a bebida depois dele conta.
+        assertTrue(Bebidas.pedeAgua("Limonada com vodka"))
+        assertTrue(Bebidas.pedeAgua("Caipifruta de morango com vodka"))
+        assertTrue(Bebidas.pedeAgua("Coquetel de frutas com vodka"))
+        assertTrue(Bebidas.pedeAgua("Red Bull com vodka"))
+        assertTrue(Bebidas.pedeAgua("Batida de maracujá"))
     }
 
     @Test
@@ -231,11 +237,15 @@ class NutricaoTeste {
         assertFalse(Bebidas.pedeAgua("Frango ao molho de vinho"))
         assertFalse(Bebidas.pedeAgua("Bolo de cerveja preta"))
         assertFalse(Bebidas.pedeAgua("Costela na cerveja"))
-        assertFalse(Bebidas.pedeAgua("Strogonoff com conhaque"))
         assertFalse(Bebidas.pedeAgua("Peixe ao vinho branco"))
         assertFalse(Bebidas.pedeAgua("Camarão na cachaça"))
+        assertFalse(Bebidas.pedeAgua("Frango à cerveja"))
         assertFalse(Bebidas.pedeAgua("Pão de cerveja"))
         assertFalse(Bebidas.pedeAgua("Bala de guaraná"))
+        // "Batida" fora do começo é a vitamina, sem álcool.
+        assertFalse(Bebidas.pedeAgua("Banana batida com leite"))
+        assertFalse(Bebidas.pedeAgua("Vitamina de banana batida"))
+        assertFalse(Bebidas.pedeAgua("Clara batida em neve"))
     }
 
     @Test
@@ -256,6 +266,8 @@ class NutricaoTeste {
         // Prato com bebida no nome não soma na água.
         assertFalse(alimentoFeitoAMao("Frango ao vinho", 180.0, 20.0, 2.0, 9.0, null, null).pedeAgua)
         assertFalse(alimentoFeitoAMao("Costela na cerveja", 300.0, 25.0, 3.0, 20.0, null, null).pedeAgua)
+        assertFalse(alimentoFeitoAMao("Vitamina de banana batida", 90.0, 3.0, 15.0, 2.0, null, null).pedeAgua)
+        assertTrue(alimentoFeitoAMao("Caipifruta com vodka", 150.0, 0.0, 20.0, 0.0, null, null).pedeAgua)
     }
 
     @Test
