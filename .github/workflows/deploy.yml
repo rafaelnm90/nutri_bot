@@ -5,6 +5,12 @@ on:
     branches:
       - main
       - master
+    # O app de calorias (app_calorias) é independente do bot: mudança só nele,
+    # nos workflows dele ou neste arquivo não reinicia o bot no servidor.
+    paths-ignore:
+      - app_calorias/**
+      - .github/workflows/app_calorias_*.yml
+      - .github/workflows/deploy.yml
 
 jobs:
   deploy:
