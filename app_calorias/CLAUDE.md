@@ -40,6 +40,7 @@ O `DECISOES.md` é o diário dos pedidos do Rafael: leia a área do que for muda
 - Pedido concluído termina com um bloco "✅ Concluído": o que foi feito, o que muda no uso e onde achar no app.
 - A rotina "Calorias: retomar trabalho pela metade" (7h52, 10h52, 13h52, 16h52 e 19h52) confere sozinha esta conversa e resolve o que ficou pela metade, sem o Rafael precisar lembrar.
 - Um assunto por commit, em português, no formato `arquivo ou área: o que mudou`.
-- PR, CI e merge: mudança pronta e validada → PR → workflow APK verde → merge. O merge publica a versão nova em Releases, de onde o Rafael baixa o APK no celular.
+- PR, CI e merge: mudança pronta e validada → PR → workflow App Calorias: APK verde, montado com a chave fixa (rodou "Montar o APK", não "Montar o APK de teste") → merge. Sem os segredos `ASSINATURA_JKS` e `ASSINATURA_SENHA`, não fazer o merge: na main o workflow falha e não publica a versão. O merge publica a versão nova em Releases, de onde o Rafael baixa o APK no celular.
+- Merge com "Create a merge commit", nunca squash nem rebase: o app entrou com `git subtree` e o histórico dele depende disso.
 - Comentários em português explicam o porquê; sem histórico e sem emoji nos comentários.
 - A chave do Gemini nunca entra no código nem no repositório: o Rafael digita no app.

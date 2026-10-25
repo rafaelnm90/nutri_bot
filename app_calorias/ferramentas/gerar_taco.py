@@ -2,7 +2,8 @@
 Gera o app/src/main/assets/taco.json a partir da planilha oficial da TACO
 (Tabela Brasileira de Composição de Alimentos, 4ª edição, NEPA/UNICAMP).
 
-Roda no GitHub Actions (workflow taco.yml), que tem acesso ao site da UNICAMP:
+Roda no GitHub Actions (workflow App Calorias: TACO, .github/workflows/app_calorias_taco.yml
+na raiz do repositório), que tem acesso ao site da UNICAMP:
 procura a planilha nos endereços conhecidos e nas páginas do NEPA, junta as abas
 pelo número do alimento e grava, por alimento, nome, categoria, kcal, proteína,
 carboidrato, gordura, fibra, sódio, cálcio, ferro, zinco, potássio e vitaminas A

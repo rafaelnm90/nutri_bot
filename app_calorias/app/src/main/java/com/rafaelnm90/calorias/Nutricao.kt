@@ -637,7 +637,7 @@ object LeitorIa {
 
 object Taco {
     /**
-     * Lê o taco.json gerado pelo workflow taco.yml a partir da tabela oficial:
+     * Lê o taco.json gerado pelo workflow App Calorias: TACO a partir da tabela oficial:
      * lista de {"nome", "categoria", "kcal", "proteina", "carboidrato", "gordura",
      * "fibra", "sodio", "calcio", "ferro", "zinco", "potassio", "vitamina_c",
      * "vitamina_a"}, valores de 100 g (minerais e vitamina C em mg, vitamina A em mcg).
