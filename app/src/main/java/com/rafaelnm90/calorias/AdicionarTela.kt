@@ -77,9 +77,13 @@ import java.io.File
  * O que a IA estima passa por uma revisão antes de entrar no diário.
  */
 
+/**
+ * [hojeAgora] é o dia de hoje que o app viu ao voltar para a frente: muda depois da
+ * meia-noite e refaz o título, que passa a mostrar o dia da comida.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AdicionarTela(dia: String, refeicao: Refeicao, aoVoltar: () -> Unit) {
+fun AdicionarTela(dia: String, hojeAgora: String, refeicao: Refeicao, aoVoltar: () -> Unit) {
     val contexto = LocalContext.current
     val banco = remember { Banco.de(contexto) }
     val ajustes = remember { Ajustes.de(contexto) }
@@ -230,7 +234,7 @@ fun AdicionarTela(dia: String, refeicao: Refeicao, aoVoltar: () -> Unit) {
                     // Fora de hoje, o dia aparece embaixo: é nele que a comida entra.
                     Column {
                         Text("Adicionar ao ${refeicao.titulo}", maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        if (dia != hoje()) {
+                        if (dia != hojeAgora || dia != hoje()) {
                             Text(
                                 tituloDoDia(dia),
                                 style = MaterialTheme.typography.bodyMedium,

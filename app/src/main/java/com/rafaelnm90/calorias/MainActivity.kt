@@ -123,7 +123,12 @@ fun App() {
     val refeicao = adicionandoEm
     if (refeicao != null) {
         BackHandler { adicionandoEm = null }
-        AdicionarTela(dia = diaDaAdicao, refeicao = refeicao, aoVoltar = { adicionandoEm = null })
+        AdicionarTela(
+            dia = diaDaAdicao,
+            hojeAgora = ultimoHoje,
+            refeicao = refeicao,
+            aoVoltar = { adicionandoEm = null },
+        )
         return
     }
 
