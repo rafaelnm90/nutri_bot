@@ -233,7 +233,7 @@ fun AdicionarTela(dia: String, hojeAgora: String, refeicao: Refeicao, aoVoltar: 
                 title = {
                     // Fora de hoje, o dia aparece embaixo: é nele que a comida entra.
                     Column {
-                        Text("Adicionar ao ${refeicao.titulo}", maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(refeicao.adicionarAo, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         if (dia != hojeAgora || dia != hoje()) {
                             Text(
                                 tituloDoDia(dia),
@@ -269,7 +269,7 @@ fun AdicionarTela(dia: String, hojeAgora: String, refeicao: Refeicao, aoVoltar: 
             OutlinedTextField(
                 value = termo,
                 onValueChange = { termo = it },
-                placeholder = { Text("O que você comeu no ${refeicao.titulo.lowercase()}?") },
+                placeholder = { Text(refeicao.oQueComeu) },
                 leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
                 trailingIcon = {
                     if (termo.isNotEmpty()) {

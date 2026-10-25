@@ -677,7 +677,7 @@ private fun RefeicaoCartao(
                 Text("${inteiro(soma.kcal)} kcal", style = MaterialTheme.typography.bodyMedium)
             }
             FilledIconButton(onClick = aoAdicionar) {
-                Icon(Icons.Filled.Add, contentDescription = "Adicionar ao ${refeicao.titulo}")
+                Icon(Icons.Filled.Add, contentDescription = refeicao.adicionarAo)
             }
         }
         if (registros.isNotEmpty()) {

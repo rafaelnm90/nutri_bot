@@ -75,11 +75,18 @@ const val ORIGEM_MEU = "meu"
 const val ORIGEM_OFF = "off"
 const val ORIGEM_IA = "ia"
 
-enum class Refeicao(val titulo: String, val emoji: String) {
+enum class Refeicao(val titulo: String, val emoji: String, private val plural: Boolean = false) {
     CAFE("Café da manhã", "☕"),
     ALMOCO("Almoço", "🍛"),
     JANTAR("Jantar", "🍲"),
-    LANCHES("Lanches", "🍎"),
+    LANCHES("Lanches", "🍎", plural = true),
+    ;
+
+    /** "Adicionar ao Jantar", "Adicionar aos Lanches". */
+    val adicionarAo get() = "Adicionar ${if (plural) "aos" else "ao"} $titulo"
+
+    /** "O que você comeu no jantar?", "O que você comeu nos lanches?" */
+    val oQueComeu get() = "O que você comeu ${if (plural) "nos" else "no"} ${titulo.lowercase()}?"
 }
 
 /** O que foi comido: o alimento (por 100 g) e quantos gramas (ou ml, nas bebidas). */

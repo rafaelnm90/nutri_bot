@@ -290,6 +290,15 @@ class NutricaoTeste {
         assertEquals(350, dia.aguaExtraMl())
     }
 
+    @Test
+    fun textoDaRefeicaoNoPluralUsaAosENos() {
+        assertEquals("Adicionar ao Jantar", Refeicao.JANTAR.adicionarAo)
+        assertEquals("Adicionar ao Café da manhã", Refeicao.CAFE.adicionarAo)
+        assertEquals("Adicionar aos Lanches", Refeicao.LANCHES.adicionarAo)
+        assertEquals("O que você comeu no almoço?", Refeicao.ALMOCO.oQueComeu)
+        assertEquals("O que você comeu nos lanches?", Refeicao.LANCHES.oQueComeu)
+    }
+
     // --- Dia mostrado, peso e números digitados ---
 
     @Test
