@@ -1,0 +1,109 @@
+# App de calorias (pasta app_calorias): testa e monta o APK. Em todo PR, só
+# confere; no merge na main, publica uma versão nova (Releases) com o APK, para
+# baixar no celular e instalar por cima. Só roda quando a pasta do app muda: o
+# app e o bot são independentes.
+name: "App Calorias: APK"
+
+on:
+  pull_request:
+    paths:
+      - app_calorias/**
+      - .github/workflows/app_calorias_apk.yml
+  push:
+    branches: [main]
+    paths:
+      - app_calorias/**
+      - .github/workflows/app_calorias_apk.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: app-calorias-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: app_calorias
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      APK: app/build/outputs/apk/release/app-release.apk
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Testes
+        run: ./gradlew testReleaseUnitTest --stacktrace
+
+      - name: Recriar a chave de assinatura
+        # A chave fica no segredo ASSINATURA_JKS (o arquivo em base64), nunca no repositório público.
+        # Num PR, sem os segredos ainda cadastrados, o APK sai com a chave de teste só para
+        # conferir que compila; na main, a chave fixa é obrigatória.
+        id: chave
+        env:
+          ASSINATURA_JKS: ${{ secrets.ASSINATURA_JKS }}
+          ASSINATURA_SENHA: ${{ secrets.ASSINATURA_SENHA }}
+        run: |
+          if [ -n "$ASSINATURA_JKS" ] && [ -n "$ASSINATURA_SENHA" ]; then
+            printf '%s' "$ASSINATURA_JKS" | base64 -d > app/assinatura.jks
+            echo "fixa=sim" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "::warning::Faltam os segredos ASSINATURA_JKS e ASSINATURA_SENHA: o APK deste PR sai com a chave de teste, só para conferir que compila."
+            echo "fixa=nao" >> "$GITHUB_OUTPUT"
+          else
+            echo "::error::Faltam os segredos ASSINATURA_JKS e ASSINATURA_SENHA"
+            exit 1
+          fi
+
+      - name: Montar o APK
+        # O número da execução vira o número da versão: cada APK novo instala por cima do anterior.
+        if: steps.chave.outputs.fixa == 'sim'
+        env:
+          ASSINATURA_SENHA: ${{ secrets.ASSINATURA_SENHA }}
+        run: ./gradlew assembleRelease -PnumeroVersao=${{ github.run_number }} --stacktrace
+
+      - name: Montar o APK de teste (sem a chave fixa)
+        if: steps.chave.outputs.fixa == 'nao'
+        run: ./gradlew assembleDebug -PnumeroVersao=${{ github.run_number }} --stacktrace
+
+      - name: Conferir a tabela TACO dentro do APK
+        if: steps.chave.outputs.fixa == 'sim'
+        run: |
+          if unzip -l "$APK" | grep -q "assets/taco.json"; then
+            echo "TACO no APK: $(unzip -p "$APK" assets/taco.json | python3 -c 'import json,sys; print(len(json.load(sys.stdin)))') alimentos"
+          else
+            echo "::warning::APK sem a tabela TACO (rode o workflow App Calorias: TACO)."
+          fi
+
+      - name: Publicar a versão
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          versao="1.${{ github.run_number }}"
+          cp "$APK" "Calorias-$versao.apk"
+          # --target prende a versão ao commit compilado, mesmo que um commit só do bot
+          # entre na main enquanto o APK é montado.
+          gh release create "calorias-v$versao" "Calorias-$versao.apk" \
+            --target "$GITHUB_SHA" \
+            --title "Calorias $versao" \
+            --notes "Baixe o arquivo Calorias-$versao.apk no celular e toque nele para instalar por cima da versão anterior. Os dados do diário continuam."
+
+      - name: Guardar o APK do PR
+        if: github.event_name == 'pull_request' && steps.chave.outputs.fixa == 'sim'
+        uses: actions/upload-artifact@v4
+        with:
+          name: calorias-apk
+          path: app_calorias/${{ env.APK }}
+          retention-days: 7
