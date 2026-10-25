@@ -93,7 +93,10 @@ jobs:
         run: |
           versao="1.${{ github.run_number }}"
           cp "$APK" "Calorias-$versao.apk"
+          # --target prende a versão ao commit compilado, mesmo que um commit só do bot
+          # entre na main enquanto o APK é montado.
           gh release create "calorias-v$versao" "Calorias-$versao.apk" \
+            --target "$GITHUB_SHA" \
             --title "Calorias $versao" \
             --notes "Baixe o arquivo Calorias-$versao.apk no celular e toque nele para instalar por cima da versão anterior. Os dados do diário continuam."
 
