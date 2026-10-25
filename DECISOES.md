@@ -11,6 +11,7 @@ riscar o antigo com "substituída em DD/MM/AAAA" e registrar o novo abaixo.
 - 11/10/2026: o app vai, mais para frente, para o repositório `rafaelnm90/nutri_bot` (o do bot de nutrição dele). Até ele liberar, ninguém mexe no nutri_bot e o código espera fora do GitHub. O nutri_bot é público: a chave de assinatura e a senha não vão para o código; ficam nos segredos `ASSINATURA_JKS` e `ASSINATURA_SENHA` do GitHub (o Rafael cadastra ao levar o app) e na cópia do Drive.
 - 11/10/2026: o APK novo é baixado do GitHub (Releases), não mandado pelo Telegram.
 - 11/10/2026: até o código ir para o nutri_bot, uma cópia de segurança fica no Google Drive dele (pasta "App Calorias (cópia de segurança)"), um arquivo por arquivo do projeto.
+- 25/10/2026: o app e os robôs da Shopee são projetos separados e independentes. Nada do app vai para o Telegram dos robôs (ele é só da Shopee). Avisos e conferências do app ficam na conversa do app, e uma rotina confere sozinha o que ficou pela metade (pedido do Rafael: "sempre avisa aqui, e sempre tenta resolver automaticamente").
 - 11/10/2026: o app adapta o que o nutri_bot já fazia (pedido do Rafael: "pegar alguns detalhes do original e adaptar"). Tudo o que ele marcou entrou; as seções abaixo dizem como.
 
 ## Funções essenciais (11/10/2026)

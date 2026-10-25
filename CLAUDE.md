@@ -32,7 +32,13 @@ O `DECISOES.md` é o diário dos pedidos do Rafael: leia a área do que for muda
 
 ## Como trabalhamos
 
-- Mesmas regras do projeto dos robôs da Shopee (`rafaelnm90/shopee`, CLAUDE.md, "Como trabalhamos"): responder em português simples, perguntar pelo seletor de opções antes de mudar comportamento, registrar no `DECISOES.md`, commits em português no formato `arquivo ou área: o que mudou`.
+- O app e os robôs da Shopee são projetos separados e independentes, sem ligação nenhuma. Nada do app passa pelo Telegram, pelos workflows (`avisar.yml` e outros) ou pelas rotinas dos robôs. Avisos e perguntas sobre o app ficam só na conversa do app.
+- Responder em português simples.
+- Antes de mudar como o app se comporta, perguntar pelo seletor de opções, com a recomendada primeiro. A opção fica aberta até o Rafael escolher. Se o seletor sumir sem resposta, mostrar a mesma pergunta de novo.
+- Todo pedido do Rafael que define comportamento entra no `DECISOES.md`. Pedido novo que contradiz um antigo: riscar o antigo com "substituída em DD/MM/AAAA".
+- Pedido concluído termina com um bloco "✅ Concluído": o que foi feito, o que muda no uso e onde achar no app.
+- A rotina "Calorias: retomar trabalho pela metade" (7h52, 10h52, 13h52, 16h52 e 19h52) confere sozinha esta conversa e resolve o que ficou pela metade, sem o Rafael precisar lembrar.
+- Um assunto por commit, em português, no formato `arquivo ou área: o que mudou`.
 - PR, CI e merge: mudança pronta e validada → PR → workflow APK verde → merge. O merge publica a versão nova em Releases, de onde o Rafael baixa o APK no celular.
 - Comentários em português explicam o porquê; sem histórico e sem emoji nos comentários.
 - A chave do Gemini nunca entra no código nem no repositório: o Rafael digita no app.
