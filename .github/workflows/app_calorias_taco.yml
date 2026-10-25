@@ -1,19 +1,23 @@
-# Baixa a tabela TACO oficial (NEPA/UNICAMP), gera o assets/taco.json e grava
-# no branch "taco-dados", de onde ele entra no app por um PR. Roda quando o
-# script muda na main, ou à mão (sempre na main: o taco-dados nasce do branch
-# em que roda).
-name: TACO
+# App de calorias (pasta app_calorias): baixa a tabela TACO oficial
+# (NEPA/UNICAMP), gera o assets/taco.json e grava no branch "app-calorias-taco",
+# de onde ele entra no app por um PR. Roda quando o script muda na main, ou à mão
+# (sempre na main: o branch nasce do branch em que roda).
+name: "App Calorias: TACO"
 
 on:
   workflow_dispatch:
   push:
     branches: [main]
     paths:
-      - ferramentas/gerar_taco.py
-      - .github/workflows/taco.yml
+      - app_calorias/ferramentas/gerar_taco.py
+      - .github/workflows/app_calorias_taco.yml
 
 permissions:
   contents: write
+
+defaults:
+  run:
+    working-directory: app_calorias
 
 jobs:
   taco:
@@ -32,12 +36,12 @@ jobs:
       - name: Gerar taco.json
         run: python ferramentas/gerar_taco.py app/src/main/assets/taco.json
 
-      - name: Gravar no branch taco-dados
+      - name: Gravar no branch app-calorias-taco
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -B taco-dados
+          git checkout -B app-calorias-taco
           git add app/src/main/assets/taco.json
           if git diff --cached --quiet; then echo "taco.json sem mudança"; exit 0; fi
-          git commit -m "assets: tabela TACO gerada pelo workflow TACO"
-          git push -f origin taco-dados
+          git commit -m "app_calorias: tabela TACO gerada pelo workflow TACO"
+          git push -f origin app-calorias-taco
