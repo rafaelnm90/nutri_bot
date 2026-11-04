@@ -83,21 +83,18 @@ class Banco private constructor(contexto: Context) :
         readableDatabase.rawQuery(
             "SELECT * FROM registros WHERE dia = ? ORDER BY criado_em",
             arrayOf(dia),
-        ).use { c ->
-            buildList {
-                while (c.moveToNext()) {
-                    add(
-                        Registro(
-                            id = c.long("id"),
-                            dia = c.texto("dia"),
-                            refeicao = Refeicao.valueOf(c.texto("refeicao")),
-                            alimento = c.alimento(),
-                            gramas = c.real("gramas"),
-                        )
-                    )
-                }
-            }
-        }
+        ).use { c -> buildList { while (c.moveToNext()) add(c.registro()) } }
+
+    /**
+     * Os registros dos dias de [inicio] a [fim] (yyyy-MM-dd, os dois inclusive), por dia e na
+     * ordem em que foram lançados. A jornada de hábitos reconta a etapa inteira com eles.
+     */
+    fun registrosEntre(inicio: String, fim: String): List<Registro> =
+        readableDatabase.rawQuery(
+            // O dia é texto yyyy-MM-dd: a ordem do texto é a das datas, e o índice registros_dia vale.
+            "SELECT * FROM registros WHERE dia BETWEEN ? AND ? ORDER BY dia, criado_em",
+            arrayOf(inicio, fim),
+        ).use { c -> buildList { while (c.moveToNext()) add(c.registro()) } }
 
     fun adicionar(dia: String, refeicao: Refeicao, alimento: Alimento, gramas: Double) {
         writableDatabase.insert("registros", null, ContentValues().apply {
@@ -302,6 +299,14 @@ class Banco private constructor(contexto: Context) :
         val i = getColumnIndexOrThrow(coluna)
         return if (isNull(i)) null else getString(i)
     }
+
+    private fun Cursor.registro() = Registro(
+        id = long("id"),
+        dia = texto("dia"),
+        refeicao = Refeicao.valueOf(texto("refeicao")),
+        alimento = alimento(),
+        gramas = real("gramas"),
+    )
 
     private fun Cursor.alimento() = Alimento(
         nome = texto("nome"),
