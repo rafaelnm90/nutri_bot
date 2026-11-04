@@ -1558,6 +1558,9 @@ object Jornada {
         }
     }
 
+    /** Depois da linha "Semana passada": o toque nela abre os 7 dias da semana que fechou. */
+    const val TEXTO_VER_SEMANA_PASSADA = "Toque para ver os dias e corrigir."
+
     fun textoSemanaPassada(semana: SemanaDaEtapa, h: Habito): String = when (semana.estado) {
         EstadoSemana.BOA -> "Semana passada: boa."
         EstadoSemana.RUIM -> "Semana passada: ${semana.deslizes} dias com ${h.titulo.lowercase()}; a contagem recomeça."

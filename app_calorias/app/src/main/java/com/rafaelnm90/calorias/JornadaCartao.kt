@@ -22,14 +22,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 
 /*
  * O cartão da jornada de hábitos no Diário, entre o check-in e o Resumo, só no dia de hoje:
  * o convite para montar, a semana da etapa com um toque para corrigir cada dia, as semanas
- * boas seguidas, as trocas e os mantidos numa linha. Tudo é recontado do diário a cada
- * leitura (Nutricao.kt, Jornada.progresso); só a vitória fica gravada.
+ * boas seguidas (com a semana passada, que também aceita correção), as trocas e os mantidos
+ * numa linha. Tudo é recontado do diário a cada leitura (Nutricao.kt, Jornada.progresso); só
+ * a vitória fica gravada.
  */
 
 /**
@@ -47,6 +51,9 @@ fun JornadaCartao(salva: JornadaSalva, versao: Int, aoMontar: () -> Unit, hojeTe
     // Em Reduzir (só no modo seguro), o dia na meta é o que fica dentro do teto.
     val reduzir = Jornada.emReduzir(salva)
     var corrigindo by remember { mutableStateOf<DiaDaEtapa?>(null) }
+    // O primeiro dia da semana passada aberta, e não um sim ou não: se a semana passada muda com
+    // o diálogo aberto (a virada para a segunda-feira), ele fecha e não reabre sozinho depois.
+    var semanaAberta by remember { mutableStateOf<String?>(null) }
     var passando by remember { mutableStateOf(false) }
     var aviso by remember { mutableStateOf<String?>(null) }
 
@@ -116,12 +123,25 @@ fun JornadaCartao(salva: JornadaSalva, versao: Int, aoMontar: () -> Unit, hojeTe
                 etapa = etapa,
                 p = progresso,
                 aoTocarDia = { corrigindo = it },
+                aoVerSemanaPassada = { semanaAberta = it.dias.first().dia },
                 aoPassar = { passando = true },
             )
         }
     }
 
     if (etapa != null) {
+        // A semana passada vem do progresso de agora: depois de um toque, ela já aparece
+        // corrigida. Com a vitória, o progresso some e o diálogo fecha junto.
+        progresso?.ultimaCompleta?.takeIf { it.dias.first().dia == semanaAberta }?.let { s ->
+            SemanaPassada(
+                s = s,
+                etapa = etapa,
+                reduzir = reduzir,
+                aoTocarDia = { corrigindo = it },
+                aoFechar = { semanaAberta = null },
+            )
+        }
+        // Vem depois da semana passada para abrir por cima dela.
         corrigindo?.let { d ->
             CorrigirDia(
                 d = d,
@@ -164,6 +184,7 @@ private fun EtapaEmCurso(
     etapa: Habito,
     p: ProgressoEtapa,
     aoTocarDia: (DiaDaEtapa) -> Unit,
+    aoVerSemanaPassada: (SemanaDaEtapa) -> Unit,
     aoPassar: () -> Unit,
 ) {
     Text(
@@ -179,31 +200,7 @@ private fun EtapaEmCurso(
     Text(Jornada.textoMeta(salva), style = MaterialTheme.typography.bodySmall)
     Spacer(Modifier.height(8.dp))
     Text("Semana ${p.atual.numero} da etapa", style = MaterialTheme.typography.labelMedium)
-    Row(Modifier.fillMaxWidth()) {
-        p.atual.dias.forEach { d ->
-            Column(
-                Modifier
-                    .weight(1f)
-                    // Dia futuro aparece na semana, mas ainda não aceita toque.
-                    .clickable(enabled = !d.futuro) { aoTocarDia(d) }
-                    .padding(vertical = 4.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                val ehHoje = d.dia == p.hoje.dia
-                Text(
-                    Jornada.letraDoDia(d.dia),
-                    style = MaterialTheme.typography.labelSmall,
-                    fontWeight = if (ehHoje) FontWeight.Bold else FontWeight.Normal,
-                )
-                Text(
-                    d.dia.takeLast(2),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Text(Jornada.simboloDoDia(d), style = MaterialTheme.typography.titleMedium)
-            }
-        }
-    }
+    DiasDaSemana(p.atual.dias, hoje = p.hoje.dia, aoTocarDia = aoTocarDia)
     Text(
         Jornada.legendaDaSemana(etapa, p.reduzir),
         style = MaterialTheme.typography.bodySmall,
@@ -219,13 +216,93 @@ private fun EtapaEmCurso(
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Bold,
         )
-        p.ultimaCompleta?.let { Text(Jornada.textoSemanaPassada(it, etapa), style = MaterialTheme.typography.bodySmall) }
+        // Na segunda-feira, o domingo já ficou na semana que fechou: o toque na linha abre os
+        // 7 dias dela para corrigir (DECISOES.md, "Jornada de hábitos").
+        p.ultimaCompleta?.let { s ->
+            val corDoToque = MaterialTheme.colorScheme.primary
+            Text(
+                buildAnnotatedString {
+                    append(Jornada.textoSemanaPassada(s, etapa))
+                    append(" ")
+                    withStyle(SpanStyle(color = corDoToque)) {
+                        append(Jornada.TEXTO_VER_SEMANA_PASSADA)
+                    }
+                },
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { aoVerSemanaPassada(s) }
+                    .padding(vertical = 4.dp),
+            )
+        }
     }
     Text(Jornada.textoHoje(p, salva.seguro), style = MaterialTheme.typography.bodyMedium)
     if (etapa.troca.isNotEmpty()) {
         Text("🔄 Trocas: ${etapa.troca}", style = MaterialTheme.typography.bodySmall)
     }
     LinhaDosMantidos(salva)
+}
+
+/**
+ * Os 7 dias de uma semana da etapa, com a letra, o número e o símbolo de cada um. O toque abre
+ * a correção do dia; o dia futuro aparece, mas ainda não aceita toque. [hoje] fica em negrito.
+ */
+@Composable
+private fun DiasDaSemana(dias: List<DiaDaEtapa>, hoje: String?, aoTocarDia: (DiaDaEtapa) -> Unit) {
+    Row(Modifier.fillMaxWidth()) {
+        dias.forEach { d ->
+            Column(
+                Modifier
+                    .weight(1f)
+                    .clickable(enabled = !d.futuro) { aoTocarDia(d) }
+                    .padding(vertical = 4.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    Jornada.letraDoDia(d.dia),
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = if (d.dia == hoje) FontWeight.Bold else FontWeight.Normal,
+                )
+                Text(
+                    d.dia.takeLast(2),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(Jornada.simboloDoDia(d), style = MaterialTheme.typography.titleMedium)
+            }
+        }
+    }
+}
+
+/**
+ * A semana que acabou de fechar, para corrigir um dia que ficou errado (na segunda-feira, o
+ * domingo). O toque em cada dia abre a mesma correção da semana atual, por cima deste diálogo.
+ */
+@Composable
+private fun SemanaPassada(
+    s: SemanaDaEtapa,
+    etapa: Habito,
+    reduzir: Boolean,
+    aoTocarDia: (DiaDaEtapa) -> Unit,
+    aoFechar: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = aoFechar,
+        title = { Text("Semana ${s.numero} da etapa") },
+        text = {
+            Column {
+                DiasDaSemana(s.dias, hoje = null, aoTocarDia = aoTocarDia)
+                Spacer(Modifier.height(8.dp))
+                Text(Jornada.textoSemanaPassada(s, etapa), style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    Jornada.legendaDaSemana(etapa, reduzir),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        },
+        confirmButton = { TextButton(onClick = aoFechar) { Text("Fechar") } },
+    )
 }
 
 /** Os mantidos ("Já não faço" e as etapas vencidas) numa linha; nada quando não há nenhum. */

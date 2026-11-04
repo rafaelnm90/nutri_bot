@@ -875,6 +875,21 @@ class NutricaoTeste {
     }
 
     @Test
+    fun naSegundaOToqueCorrigeODomingoDaSemanaPassada() {
+        // Semana 1 com Coca na quinta e no domingo: ruim. Na segunda, 09/11, o toque no domingo
+        // (foi isotônico no treino) faz a semana que fechou ficar boa, e a contagem anda.
+        val r = periodo("2026-11-02", "2026-11-08", comCoca = setOf("2026-11-05", "2026-11-08"))
+        assertEquals(EstadoSemana.RUIM, progresso(r, hoje = "2026-11-09").ultimaCompleta!!.estado)
+        val salva = Jornada.comToque(montada(), "2026-11-08", Habito.BEBIDA_ACUCAR, EstadoDia.NA_META)
+        val p = progresso(r, hoje = "2026-11-09", toques = Jornada.toquesDo(salva, Habito.BEBIDA_ACUCAR))
+        assertEquals(EstadoSemana.BOA, p.ultimaCompleta!!.estado)
+        assertTrue(p.ultimaCompleta!!.dias.last().tocado)
+        assertEquals(1, p.seguidas)
+        // A semana que fechou não tem dia futuro: os 7 aceitam o toque.
+        assertTrue(p.ultimaCompleta!!.dias.none { it.futuro })
+    }
+
+    @Test
     fun semanaRuimDepoisDaVitoriaNaoApagaAVitoria() {
         val p = progresso(periodo("2026-11-02", "2026-11-22", comCoca = setOf("2026-11-16", "2026-11-17")), hoje = "2026-11-23")
         assertEquals(2, p.seguidas)
@@ -1229,7 +1244,8 @@ Responda em texto simples, sem markdown e sem asteriscos, com linhas curtas e al
             listOf(
                 Jornada.PERGUNTA_SAUDE, Jornada.TEXTO_MODO_SEGURO, Jornada.TEXTO_MODO_SEGURO_CARTAO,
                 Jornada.TEXTO_RESPOSTA_SAUDE, Jornada.TEXTO_SUS, Jornada.TEXTO_PESO_CIGARRO, Jornada.TEXTO_LALLY,
-                Jornada.TEXTO_PROXIMA_VERSAO, Jornada.textoMeta(j), Jornada.textoMeta(j.copy(seguro = true)),
+                Jornada.TEXTO_PROXIMA_VERSAO, Jornada.TEXTO_VER_SEMANA_PASSADA, Jornada.textoMeta(j),
+                Jornada.textoMeta(j.copy(seguro = true)),
                 Jornada.textoMeta(seguroReduzir),
             ) +
             listOfNotNull(Jornada.textoMantidos(Jornada.comVitoria(j, Habito.BEBIDA_ACUCAR, "2026-11-15"))) +
