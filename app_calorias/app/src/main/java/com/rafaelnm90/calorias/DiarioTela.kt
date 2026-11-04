@@ -69,9 +69,10 @@ import java.time.format.DateTimeFormatter
 
 /*
  * A aba Diário: o resumo do dia (calorias na faixa, macros, nutrientes), o
- * check-in semanal das fases, as ferramentas de IA (sugerir refeição, ler
- * rótulo, relatório do dia), o jejum, as quatro refeições, os exercícios e a
- * água. As setas trocam o dia mostrado.
+ * check-in semanal das fases, o cartão da jornada de hábitos (só hoje, com a
+ * jornada ligada), as ferramentas de IA (sugerir refeição, ler rótulo,
+ * relatório do dia), o jejum, as quatro refeições, os exercícios e a água. As
+ * setas trocam o dia mostrado.
  */
 
 private val COR_OK = Color(0xFF1B7F5C)
@@ -83,6 +84,7 @@ fun DiarioTela(
     aoMudarDia: (String) -> Unit,
     aoAdicionar: (Refeicao) -> Unit,
     aoAbrirAjustes: () -> Unit,
+    aoMontarJornada: () -> Unit,
 ) {
     val contexto = LocalContext.current
     val banco = remember { Banco.de(contexto) }
@@ -201,6 +203,9 @@ fun DiarioTela(
         }
         if (ehHoje && CheckIn.pendente(perfil, LocalDate.now())) {
             item { CheckInCartao(perfil.fase) { fase -> ajustes.concluirCheckIn(fase) } }
+        }
+        if (ehHoje && jornada.ligada) {
+            item { JornadaCartao(jornada, versao, aoMontarJornada, hojeTexto = dia) }
         }
         item { Resumo(total, metaKcal, meta, gastas, ehHoje) }
         item { NutrientesCartao(micros, MetasNutrientes.de(perfil, ano)) }

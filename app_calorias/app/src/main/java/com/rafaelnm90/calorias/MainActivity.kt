@@ -38,9 +38,9 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LifecycleResumeEffect
 
 /*
- * A única Activity do app: o tema, a troca entre as abas (Diário, Peso, Ajustes)
- * e a tela de adicionar alimento a uma refeição. Ao abrir, liga os lembretes e
- * pede a permissão de notificação.
+ * A única Activity do app: o tema, a troca entre as abas (Diário, Peso, Ajustes),
+ * a tela de adicionar alimento a uma refeição e a de montar a jornada de hábitos.
+ * Ao abrir, liga os lembretes e pede a permissão de notificação.
  */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -96,6 +96,8 @@ fun App() {
     // O dia da adição fica preso ao abrir a tela: a volta da câmera depois da meia-noite
     // pode trocar o dia do Diário, mas a comida vai para o dia em que a pessoa tocou em +.
     var diaDaAdicao by rememberSaveable { mutableStateOf(dia) }
+    // A tela Montar a jornada, aberta pelo Diário ou por Ajustes; saveable, como a de adicionar.
+    var montandoJornada by rememberSaveable { mutableStateOf(false) }
 
     // Voltou ao app num dia novo: quem estava vendo "hoje" passa para o dia novo,
     // senão a comida seria gravada no dia de ontem.
@@ -128,6 +130,20 @@ fun App() {
             hojeAgora = ultimoHoje,
             refeicao = refeicao,
             aoVoltar = { adicionandoEm = null },
+        )
+        return
+    }
+
+    if (montandoJornada) {
+        BackHandler { montandoJornada = false }
+        JornadaTela(
+            aoVoltar = { montandoJornada = false },
+            // Depois de montar, o Diário de hoje já mostra a etapa.
+            aoComecar = {
+                montandoJornada = false
+                dia = hoje()
+                aba = Aba.DIARIO
+            },
         )
         return
     }
@@ -165,9 +181,10 @@ fun App() {
                         adicionandoEm = it
                     },
                     aoAbrirAjustes = { aba = Aba.AJUSTES },
+                    aoMontarJornada = { montandoJornada = true },
                 )
                 Aba.PESO -> PesoTela()
-                Aba.AJUSTES -> AjustesTela()
+                Aba.AJUSTES -> AjustesTela(aoMontarJornada = { montandoJornada = true })
             }
         }
     }

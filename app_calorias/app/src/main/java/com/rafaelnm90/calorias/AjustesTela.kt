@@ -37,15 +37,19 @@ import java.time.LocalDate
 
 /*
  * A aba Ajustes: o perfil que calcula a meta de calorias, a fase da dieta, as
- * metas de água e de jejum, os lembretes e a chave do Gemini. Nada é gravado
- * até tocar em Salvar.
+ * metas de água e de jejum, os lembretes, a chave do Gemini e a jornada de
+ * hábitos. Nada é gravado até tocar em Salvar, menos o interruptor da jornada,
+ * que vale na hora.
  */
 
+/** [aoMontarJornada] abre a tela Montar a jornada, em tela cheia. */
 @Composable
-fun AjustesTela() {
+fun AjustesTela(aoMontarJornada: () -> Unit) {
     val contexto = LocalContext.current
     val ajustes = remember { Ajustes.de(contexto) }
     val salvo by ajustes.perfil.collectAsStateWithLifecycle()
+    val jornadaAjustes = remember { JornadaAjustes.de(contexto) }
+    val jornada by jornadaAjustes.salva.collectAsStateWithLifecycle()
 
     var sexo by remember { mutableStateOf(salvo.sexo) }
     var ano by remember { mutableStateOf(salvo.anoNascimento.toString()) }
@@ -79,6 +83,10 @@ fun AjustesTela() {
         lembretes = lembretes,
         chaveGemini = chave,
     )
+    // A montagem é outra tela e trocar de tela perde o que foi digitado: ela só abre com tudo
+    // salvo. Os dois lados com uma casa, como os campos mostram: senão um peso salvo com duas
+    // casas (80,35) contaria como mudança mesmo depois do Salvar.
+    val temMudanca = novo.comoNosCampos() != salvo.comoNosCampos()
     val anoAtual = LocalDate.now().year
     val metaKcal = Calculos.metaKcal(novo, anoAtual)
     val faixa = Calculos.faixaKcal(metaKcal)
@@ -223,6 +231,35 @@ fun AjustesTela() {
             modifier = Modifier.fillMaxWidth(),
         ) { Text("Salvar") }
 
+        Cartao {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text("Jornada de hábitos", fontWeight = FontWeight.Bold)
+                    Text(
+                        "Um hábito por vez, começando pela bebida com açúcar, conferido pelo seu diário. " +
+                            "Desligada, o app fica como sempre foi. Liga e desliga na hora, sem o Salvar.",
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+                Spacer(Modifier.width(8.dp))
+                // Desligar não apaga nada: ligar de novo volta de onde parou.
+                Switch(checked = jornada.ligada, onCheckedChange = { jornadaAjustes.ligar(it) })
+            }
+            if (jornada.ligada) {
+                Spacer(Modifier.height(8.dp))
+                Button(onClick = aoMontarJornada, enabled = !temMudanca, modifier = Modifier.fillMaxWidth()) {
+                    Text("Montar a jornada")
+                }
+                if (temMudanca) {
+                    Text(
+                        "Salve os ajustes antes de montar a jornada.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+        }
+
         Text(
             "Alimentos: Tabela Brasileira de Composição de Alimentos (TACO, NEPA/UNICAMP) e " +
                 "Open Food Facts (licença ODbL). IA: Google Gemini.",
@@ -245,3 +282,13 @@ private fun Opcao(texto: String, marcada: Boolean, aoEscolher: () -> Unit) {
         Text(texto)
     }
 }
+
+/**
+ * O perfil como os campos mostram, com uma casa: o peso volta das preferências como float
+ * (80,3 vira 80,30000305) e o campo arredonda a 1 casa; nada disso é mudança não salva.
+ */
+private fun Perfil.comoNosCampos() = copy(
+    alturaCm = lerNumero(paraCampo(alturaCm)) ?: 0.0,
+    pesoKg = lerNumero(paraCampo(pesoKg)) ?: 0.0,
+    pesoMetaKg = lerNumero(paraCampo(pesoMetaKg)) ?: 0.0,
+)
