@@ -71,7 +71,8 @@ riscar o antigo com "substituída em DD/MM/AAAA" e registrar o novo abaixo.
 - 04/11/2026: a jornada aparece num cartão curto no topo do Diário, antes do Resumo, com a etapa atual, os toques do dia e os mantidos numa linha.
 - 04/11/2026: a jornada vale para todos os objetivos (Emagrecer, Manter e Ganhar).
 - 04/11/2026: depois da vitória, a próxima etapa espera o toque em "Começar a próxima".
-- 04/11/2026: dia sem nada lançado fica sem dado (não conta a favor nem contra). A semana só pode ser boa com pelo menos 5 dias lançados, e a sequência de semanas só espera.
+- ~~04/11/2026: dia sem nada lançado fica sem dado (não conta a favor nem contra). A semana só pode ser boa com pelo menos 5 dias lançados, e a sequência de semanas só espera.~~ (substituída em 04/11/2026)
+- 04/11/2026: dia sem nada lançado fica sem dado (não conta a favor nem contra). A semana só pode ser boa com pelo menos 5 dias lançados; com menos, a sequência de semanas só espera. A exceção é a semana com 2 dias ou mais com deslize: ela conta como ruim e zera as semanas boas seguidas, mesmo com menos de 5 dias lançados (resposta do Rafael: "Conta como ruim"; 2 deslizes já passam do perdão).
 - 04/11/2026: saúde: uma pergunta só, ao ligar a jornada (rins, coração, fígado, insulina, gravidez, transtorno alimentar). Um sim deixa só o que é seguro: sem etapas de água e proteína, sem eliminar com cadeado (vira reduzir), sem contar semanas seguidas (passa de etapa quando quiser) e com "siga o seu médico". A resposta fica só no celular.
 - 04/11/2026: jejum: a meta continua aceitando até 72 h, mas avisa acima de 24 h ("só com acompanhamento médico"), com a jornada ligada ou não.
 - 04/11/2026: café e chá adoçados em casa ficam no reduzir, com teto: até 1 colher de chá rasa por xícara (uns 4 g), ou nada.

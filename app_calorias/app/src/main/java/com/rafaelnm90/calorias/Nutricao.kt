@@ -1207,16 +1207,19 @@ object Jornada {
 
     /**
      * Semana boa: 5 dias ou mais com dado e no máximo 1 deslize (nos de eliminar, 1 é perdoado).
-     * Menos de 5 dias com dado: sem dado, não conta nem quebra. A semana em curso ainda não conta.
+     * 2 deslizes ou mais: ruim, mesmo com menos de 5 dias com dado. Menos de 5 dias com dado e
+     * no máximo 1 deslize: sem dado, não conta nem quebra. A semana em curso ainda não conta.
      */
     fun avaliarSemana(dias: List<DiaDaEtapa>, completa: Boolean): EstadoSemana {
         if (!completa) return EstadoSemana.EM_CURSO
         val comDado = dias.count { it.estado != EstadoDia.SEM_DADO }
         val deslizes = dias.count { it.estado == EstadoDia.DESLIZE }
         return when {
+            // Os deslizes vêm antes dos dias lançados: 2 já passam do perdão, seja qual for o
+            // resto da semana (DECISOES.md, "Jornada de hábitos").
+            deslizes > DESLIZES_PERDOADOS -> EstadoSemana.RUIM
             comDado < DIAS_COM_DADO_NA_SEMANA -> EstadoSemana.SEM_DADO
-            deslizes <= DESLIZES_PERDOADOS -> EstadoSemana.BOA
-            else -> EstadoSemana.RUIM
+            else -> EstadoSemana.BOA
         }
     }
 
@@ -1596,7 +1599,8 @@ object Jornada {
             seguro -> "A Etapa 1 é a $nome e começa hoje. No modo seguro, você passa de etapa quando quiser."
             else -> "A Etapa 1 é a $nome e começa hoje. Você vence a etapa com 2 semanas boas seguidas: 5 dias ou " +
                 "mais lançados no diário e no máximo 1 dia com $nome. Dia sem nada lançado não conta nem " +
-                "atrapalha. Depois, a próxima etapa espera o seu toque."
+                "atrapalha, mas 2 dias com $nome na mesma semana recomeçam a contagem. Depois, a próxima " +
+                "etapa espera o seu toque."
         }
     }
 

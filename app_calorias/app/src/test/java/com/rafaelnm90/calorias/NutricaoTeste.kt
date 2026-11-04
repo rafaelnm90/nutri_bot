@@ -846,13 +846,32 @@ class NutricaoTeste {
     }
 
     @Test
-    fun semanaComPoucosDiasEDoisDeslizesSoEspera() {
-        // Semana 2 com 4 dias lançados e 2 com Coca: fica sem dado e não zera a semana 1.
+    fun semanaComPoucosDiasEDoisDeslizesEhRuim() {
+        // Semana 2 com 4 dias lançados e 2 com Coca: 2 deslizes já passam do perdão, então ela é
+        // ruim mesmo sem os 5 dias e zera a semana 1. A semana 3, boa, conta 1 de novo.
         val r = periodo("2026-11-02", "2026-11-06") +
             periodo("2026-11-09", "2026-11-12", comCoca = setOf("2026-11-09", "2026-11-10")) +
             periodo("2026-11-16", "2026-11-20")
-        assertEquals(EstadoSemana.SEM_DADO, progresso(r, hoje = "2026-11-16").ultimaCompleta!!.estado)
-        assertEquals("2026-11-22", progresso(r, hoje = "2026-11-23").vencidaEm)
+        val naSemana3 = progresso(r, hoje = "2026-11-16")
+        assertEquals(EstadoSemana.RUIM, naSemana3.ultimaCompleta!!.estado)
+        assertEquals(4, naSemana3.ultimaCompleta!!.diasComDado)
+        assertEquals(0, naSemana3.seguidas)
+        assertEquals(
+            "Semana passada: 2 dias com bebida com açúcar; a contagem recomeça.",
+            Jornada.textoSemanaPassada(naSemana3.ultimaCompleta!!, Habito.BEBIDA_ACUCAR),
+        )
+        val p = progresso(r, hoje = "2026-11-23")
+        assertEquals(1, p.seguidas)
+        assertNull(p.vencidaEm)
+        // Só 2 dias lançados, os 2 com Coca: ruim também.
+        val doisDias = periodo("2026-11-02", "2026-11-03", comCoca = setOf("2026-11-02", "2026-11-03"))
+        assertEquals(EstadoSemana.RUIM, progresso(doisDias, hoje = "2026-11-09").ultimaCompleta!!.estado)
+        // 2 deslizes tocados em dias sem nada lançado contam do mesmo jeito.
+        val tocados = mapOf("2026-11-07" to EstadoDia.DESLIZE, "2026-11-08" to EstadoDia.DESLIZE)
+        assertEquals(EstadoSemana.RUIM, progresso(emptyList(), hoje = "2026-11-09", toques = tocados).ultimaCompleta!!.estado)
+        // Com 1 deslize só, a semana de 4 dias continua sem dado: só espera.
+        val umDeslize = periodo("2026-11-02", "2026-11-05", comCoca = setOf("2026-11-02"))
+        assertEquals(EstadoSemana.SEM_DADO, progresso(umDeslize, hoje = "2026-11-09").ultimaCompleta!!.estado)
     }
 
     @Test
