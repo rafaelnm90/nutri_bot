@@ -1031,6 +1031,47 @@ class NutricaoTeste {
     }
 
     @Test
+    fun sugerirRefeicaoEvitaOEliminado() {
+        val e = Jornada.escolhasIniciais(false) + mapOf(
+            Habito.ALCOOL to Escolha.JA_NAO_FACO,
+            Habito.CIGARRO to Escolha.ELIMINAR,
+            Habito.DOCES to Escolha.ELIMINAR,
+            Habito.FRITURA to Escolha.REDUZIR,
+            Habito.BELISCAR to Escolha.ELIMINAR,
+        )
+        val outros = listOf(OutroHabito("Pão de queijo", Escolha.ELIMINAR), OutroHabito("Pipoca", Escolha.REDUZIR))
+        val j = Jornada.montar(JornadaSalva(ligada = true), false, e, outros, "2026-11-02")
+        assertEquals(
+            listOf(Habito.BEBIDA_ACUCAR.paraIa, Habito.EMBUTIDOS.paraIa, Habito.ALCOOL.paraIa, Habito.DOCES.paraIa, "Pão de queijo"),
+            Jornada.evitarNaSugestao(j),
+        )
+        assertTrue(Jornada.evitarNaSugestao(j.copy(ligada = false)).isEmpty())
+        assertTrue(Jornada.evitarNaSugestao(JornadaSalva(ligada = true)).isEmpty())
+        // No modo seguro, com tudo em Reduzir, nada vai para o pedido.
+        val seguro = Jornada.montar(JornadaSalva(ligada = true), true, Jornada.escolhasIniciais(true), emptyList(), "2026-11-02")
+        assertTrue(Jornada.evitarNaSugestao(seguro).isEmpty())
+    }
+
+    @Test
+    fun pedidoDaSugestaoSemEliminadosNaoTemALinhaDoEvitar() {
+        val alvo = AlvoRefeicao("almoço", 700)
+        val semEvitar = """Você é um nutricionista experiente.
+A pessoa tem cerca de 700 kcal para o almoço, com o objetivo de garantir o déficit calórico para emagrecer.
+Até agora, hoje, ela consumiu: proteínas 30 g.
+Atue de forma compensatória: se notar excesso de gordura, sugira opções magras; se faltar proteína,
+fibras ou vitamina C, priorize alimentos ricos nelas.
+
+Sugira 3 opções de refeição saudáveis, práticas e do dia a dia no Brasil, cuja soma fique perto de 700 kcal.
+Para cada uma, dê as porções em gramas ou medidas caseiras, o total de calorias e uma frase de por que ela
+equilibra o dia. Seja encorajador.
+Responda em texto simples, sem markdown e sem asteriscos, com linhas curtas e alguns emojis."""
+        assertEquals(semEvitar, Gemini.textoSugestao(alvo, Objetivo.PERDER, "proteínas 30 g"))
+        val novo = Gemini.textoSugestao(alvo, Objetivo.PERDER, "proteínas 30 g", listOf("bebida alcoólica", "Pão \"de\" queijo"))
+        assertTrue(novo.contains("A pessoa tirou da alimentação: bebida alcoólica; Pão 'de' queijo. Não sugira nada disso"))
+        assertTrue(novo.contains("nelas.\nA pessoa tirou"))
+    }
+
+    @Test
     fun outroHabitoNuncaEliminaRefeicaoGrupoSalOuAgua() {
         assertEquals(Bloqueio.REFEICAO, Jornada.bloqueioDeEliminar("jantar"))
         assertEquals(Bloqueio.REFEICAO, Jornada.bloqueioDeEliminar("Pular o café da manhã"))
