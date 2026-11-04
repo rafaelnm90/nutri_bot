@@ -60,3 +60,36 @@ riscar o antigo com "substituída em DD/MM/AAAA" e registrar o novo abaixo.
 
 - Exercícios: o treino descrito em texto; a IA estima as calorias pelo peso da pessoa. Aparecem como "Gastas" no resumo, sem mudar a meta. Resposta do Rafael em 11/10/2026: "só mostrar" (não somar na meta, como no Yazio; a IA costuma superestimar o gasto).
 - Lembretes no celular, das 8h às 22h, com as regras do bot: água atrasada 600 ml ou mais (de novo em 2,5 h se passa de 1 L, senão 4 h); comida atrasada mais de 35% do dia (de novo em 3 h se passa de 50%, senão 5 h). Diferença do bot: nenhum lembrete de comida durante o jejum. Também avisam o check-in semanal e, às 21 h, o relatório do dia.
+
+## Jornada de hábitos (03/11/2026 e 04/11/2026)
+
+- 03/11/2026: pedido do Rafael: "o usuário é questionado onde quer chegar, o que quer eliminar de hábitos e o que quer reduzir; você também pode tomar a frente do que deve ser eliminado, uma vez que existem hábitos que não podem ser mantidos de forma alguma."
+- 03/11/2026: calorias como hoje (resposta do Rafael: "Contagem como hoje"): a jornada fica à parte, ligada em Ajustes. Calorias, fases da dieta, check-in e lembretes não mudam, com déficit desde o primeiro dia. Desligada, o app fica igual ao de antes da jornada.
+- 03/11/2026: o app toma a frente, com cadeado, em três hábitos: bebida com açúcar, embutidos e álcool. Meta zero; um deslize não apaga nada; o que ele já não faz começa como mantido; o resto ele escolhe (eliminar, reduzir com teto ou não é meu caso).
+- 03/11/2026: a etapa vence com 2 semanas boas seguidas. Semana boa: 5 de 7 dias na meta nos hábitos de todo dia (nos de eliminar, 1 deslize perdoado) e dentro do teto nos de vezes por semana. Um dia ruim não zera nada. O vencido segue conferido como mantido.
+- 03/11/2026: cada parte da jornada é uma etapa (resposta do Rafael: "Etapa", como em "Jornada de hábitos: Etapa 2 de 8, Água"). As fases da dieta continuam Fase 1 Adaptação, 2 Ideal e 3 Drástica.
+- 04/11/2026: a jornada aparece num cartão curto no topo do Diário, antes do Resumo, com a etapa atual, os toques do dia e os mantidos numa linha.
+- 04/11/2026: a jornada vale para todos os objetivos (Emagrecer, Manter e Ganhar).
+- 04/11/2026: depois da vitória, a próxima etapa espera o toque em "Começar a próxima".
+- 04/11/2026: dia sem nada lançado fica sem dado (não conta a favor nem contra). A semana só pode ser boa com pelo menos 5 dias lançados, e a sequência de semanas só espera.
+- 04/11/2026: saúde: uma pergunta só, ao ligar a jornada (rins, coração, fígado, insulina, gravidez, transtorno alimentar). Um sim deixa só o que é seguro: sem etapas de água e proteína, sem eliminar com cadeado (vira reduzir), sem contar semanas seguidas (passa de etapa quando quiser) e com "siga o seu médico". A resposta fica só no celular.
+- 04/11/2026: jejum: a meta continua aceitando até 72 h, mas avisa acima de 24 h ("só com acompanhamento médico"), com a jornada ligada ou não.
+- 04/11/2026: café e chá adoçados em casa ficam no reduzir, com teto: até 1 colher de chá rasa por xícara (uns 4 g), ou nada.
+- 04/11/2026: suco 100% de fruta fica no reduzir: até 150 ml por dia, junto com a refeição.
+- 04/11/2026: trocas da etapa da bebida: primeiro água, água com gás e chá sem açúcar; refri zero só como ponte. A regra da água fica igual.
+- 04/11/2026: o Sugerir refeição pede à IA que evite o que foi eliminado (bebida com açúcar, embutidos, álcool).
+- 04/11/2026: o cigarro entra na lista do eliminar, conferido por toque, com "não é meu caso", a indicação do tratamento de graça pelo SUS (INCA) e o aviso de que parar costuma trazer uns 4 a 5 kg no primeiro ano (Aubin e outros, BMJ, 2012).
+- 04/11/2026: onde quer chegar: mostra a primeira parada, de 5% a 10% do peso de hoje, quando o peso meta está longe (AHA/ACC/TOS, 2013), e um aviso leve, sem travar, se o peso meta der IMC abaixo de 18,5 (ou de 22 a partir dos 60 anos).
+- 04/11/2026: a jornada chega em passos. O passo 1 traz o interruptor em Ajustes, a tela Montar a jornada, o cartão no Diário, a etapa da bebida com açúcar, o aviso do jejum e o Sugerir refeição sem o que foi eliminado. As outras etapas, a conferência dos mantidos, a pausa, o mapa da jornada e os lembretes novos vêm nos próximos.
+
+Padrões da jornada (escolhidos pelo Claude, a confirmar com o Rafael):
+
+- A bebida com açúcar é achada pelo diário: é bebida pelo nome (uma lista da jornada, além das bebidas que o app já reconhece) ou pela marca "pede água". Ficam de fora o álcool e a cerveja sem álcool (a troca sugerida para ele), o zero, diet e light ("zero lactose" e "zero gordura" não contam como zero), a água, a água de coco, o café, o chá feito em casa, o leite puro e o suco 100%. Contam também o suco e a limonada com açúcar feitos em casa e o leite com achocolatado. Conta com 2,5 g de açúcar por 100 ml ou mais ou, sem o açúcar informado, com 5 g de carboidrato por 100 ml ou mais. Um toque no dia vale mais que a conta.
+- "Outro hábito" nunca aceita como eliminar uma refeição, um grupo inteiro (arroz, feijão, pão, fruta, leite, óleo), o sal ou a água, nem escritos de outro jeito ("cortar o pão", "arroz e feijão", "ficar sem jantar"), e explica o porquê. Reduzir sempre pode.
+- O cartão só aparece no dia de hoje, e só os dias da semana atual aceitam o toque de correção.
+- A pergunta de saúde fica na tela Montar a jornada (aberta por Ajustes ou pelo cartão do Diário, com a jornada ligada): nada começa sem ela e sem a resposta do cigarro.
+- "Onde quer chegar" usa o peso, o peso meta e o objetivo do perfil, sem campos novos: o que mudar ali muda o perfil, e a meta de calorias calculada acompanha. A primeira parada aparece com o peso meta mais de 10% abaixo do peso de hoje.
+- Na montagem, a lista do reduzir começa toda em "Não é meu caso".
+- No modo seguro, os três obrigatórios começam em Reduzir. A bebida com açúcar em Reduzir tem o teto de 1 copo de 200 ml por dia, e o dia só é deslize acima dele.
+- O Sugerir refeição também evita o que está em "Já não faço" e os "Outro hábito" marcados como eliminar.
+- Montar de novo com a mesma etapa e a mesma resposta de saúde guarda o início, os toques e a espera de "Começar a próxima"; mudar a resposta de saúde recomeça a etapa.

@@ -11,14 +11,15 @@ O `DECISOES.md` é o diário dos pedidos do Rafael: leia a área do que for muda
 
 | Arquivo | O que tem |
 |---|---|
-| `Nutricao.kt` | Regras sem Android: `Alimento` e `Micros` (valores de 100 g), `Registro`, `Perfil`, `Fase`, `Calculos` (metas e faixas), `MetasNutrientes`, `CheckIn`, `Sugestao`, `Lembretes` (quando avisar), `Bebidas`, `Busca`, `LeitorIa` (respostas do Gemini) e `Taco` |
-| `Banco.kt` | SQLite do celular: diário, meus alimentos, água, jejum, exercícios e peso. `versao` muda a cada gravação e as telas releem |
-| `Ajustes.kt` | Perfil (com fase e início dela) e chave do Gemini nas preferências do celular |
+| `Nutricao.kt` | Regras sem Android: `Alimento` e `Micros` (valores de 100 g), `Registro`, `Perfil`, `Fase`, `Calculos` (metas e faixas), `MetasNutrientes`, `CheckIn`, `Sugestao`, `Lembretes` (quando avisar), `Bebidas`, `Busca`, `LeitorIa` (respostas do Gemini), `Taco` e `Jornada` (a jornada de hábitos: hábitos, escolhas, semanas da etapa e a bebida com açúcar achada no diário) |
+| `Banco.kt` | SQLite do celular: diário, meus alimentos, água, jejum, exercícios e peso. `versao` muda a cada gravação e as telas releem; `registrosEntre` lê um período |
+| `Ajustes.kt` | Perfil (com fase e início dela) e chave do Gemini nas preferências do celular; a jornada de hábitos (`JornadaAjustes`) no arquivo de preferências à parte `jornada` |
 | `Internet.kt` | `Gemini` (foto, descrição, correção, sugestão, rótulo, relatório e exercício, com cascata de modelos) e `OpenFoodFacts` (código de barras) |
 | `Lembrete.kt` | Os lembretes: WorkManager a cada 30 min e as notificações |
 | `Componentes.kt` | Formato pt-BR, `Cartao`, diálogos de espera e aviso, `CampoNumero`, foto reduzida, `TacoNoApp` |
-| `MainActivity.kt` | Tema e troca de abas (Diário, Peso, Ajustes) e da tela de adicionar |
+| `MainActivity.kt` | Tema e troca de abas (Diário, Peso, Ajustes) e das telas de adicionar e de montar a jornada |
 | `DiarioTela.kt`, `AdicionarTela.kt`, `PesoTela.kt`, `AjustesTela.kt` | As telas |
+| `JornadaTela.kt`, `JornadaCartao.kt` | A tela Montar a jornada e o cartão da jornada no Diário |
 
 - `app/src/main/assets/taco.json`: a tabela TACO, gerada pelo workflow **App Calorias: TACO** (`ferramentas/gerar_taco.py`), que grava no branch `app-calorias-taco`; de lá ela entra por PR. Nunca escrever valores à mão.
 - Chave fixa de assinatura: sem ela o APK novo não instala por cima e o Rafael perderia o diário. Nunca trocar depois da primeira instalação. Não fica no repositório (o `.gitignore` barra `*.jks`; o nutri_bot é público): está nos segredos do GitHub `ASSINATURA_JKS` (arquivo em base64) e `ASSINATURA_SENHA`, e na cópia de segurança do Drive dele. O workflow APK recria o `app/assinatura.jks` antes de montar.
