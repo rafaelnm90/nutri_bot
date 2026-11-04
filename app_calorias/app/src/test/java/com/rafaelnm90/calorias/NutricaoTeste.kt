@@ -516,4 +516,20 @@ class NutricaoTeste {
         assertNull(OpenFoodFacts.lerProduto("2", """{"status":0,"status_verbose":"product not found"}"""))
         assertNull(OpenFoodFacts.lerProduto("3", """{"status":1,"product":{"product_name":"Sem tabela"}}"""))
     }
+
+    // --- Jornada de hábitos ---
+
+    @Test
+    fun alcoolSeparadoDoRefriSemMudarAAgua() {
+        assertTrue(Bebidas.temAlcool("Cerveja sem álcool"))
+        assertTrue(Bebidas.temAlcool("Vinho tinto"))
+        assertTrue(Bebidas.temAlcool("Batida de coco com cachaça"))
+        assertTrue(Bebidas.temAlcool("Moscow mule com vodka"))
+        assertFalse(Bebidas.temAlcool("Coca-Cola"))
+        assertFalse(Bebidas.temAlcool("Guaraná Antarctica"))
+        assertFalse(Bebidas.temAlcool("Banana batida com leite"))
+        assertFalse(Bebidas.temAlcool("Sanduíche cubano"))
+        assertFalse(Bebidas.temAlcool("Red Bull Energy Drink"))
+        assertTrue(Bebidas.temAlcool("Drink de maracujá"))
+    }
 }

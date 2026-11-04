@@ -434,14 +434,19 @@ object Busca {
 }
 
 object Bebidas {
-    /** Palavras que marcam bebida alcoólica ou refrigerante (inclusive zero). */
-    private val PALAVRAS = listOf(
+    /** Palavras de bebida alcoólica. */
+    private val ALCOOL = listOf(
         "cerveja", "chope", "chopp", "vinho", "espumante", "champanhe", "cachaca", "caipirinha",
         "caipiroska", "vodka", "whisky", "uisque", "gin", "rum", "tequila", "licor", "conhaque",
-        "sake", "drink", "refrigerante", "coca", "pepsi", "fanta", "sprite", "soda", "tonica",
-        "guarana", "aguardente", "mojito", "mule", "cuba", "negroni", "aperol", "spritz", "sangria", "quentao",
-        "daiquiri",
+        "sake", "drink", "aguardente", "mojito", "mule", "cuba", "negroni", "aperol", "spritz", "sangria",
+        "quentao", "daiquiri",
     )
+
+    /** Palavras de refrigerante (inclusive zero). */
+    private val REFRI = listOf("refrigerante", "coca", "pepsi", "fanta", "sprite", "soda", "tonica", "guarana")
+
+    /** Palavras que marcam bebida alcoólica ou refrigerante: as duas somam igual na meta de água. */
+    private val PALAVRAS = ALCOOL + REFRI
 
     /** Comidas que levam bebida no preparo ou no nome: não pedem água. */
     private val PREPAROS = listOf(
@@ -482,9 +487,24 @@ object Bebidas {
         }
     }
 
+    /**
+     * Pelo nome, se tem palavra de bebida alcoólica ("Cerveja sem álcool" também
+     * tem). Não olha o preparo: serve para quem já sabe que o item é bebida.
+     */
+    fun temAlcool(nome: String): Boolean {
+        val doNome = Busca.palavras(nome)
+        if (doNome.firstOrNull() == "batida") return true
+        // "Energy drink" é energético, não drink.
+        return doNome.indices.any { i ->
+            casa(doNome[i], ALCOOL) && !(doNome[i] == "drink" && doNome.getOrNull(i - 1) == "energy")
+        }
+    }
+
     // "refri" só como palavra inteira, para "refrito" não contar.
-    private fun ehAlcoolOuRefri(palavra: String) =
-        palavra == "refri" || PALAVRAS.any { p -> palavra == p || (p.length >= 5 && palavra.startsWith(p)) }
+    private fun ehAlcoolOuRefri(palavra: String) = palavra == "refri" || casa(palavra, PALAVRAS)
+
+    private fun casa(palavra: String, lista: List<String>) =
+        lista.any { p -> palavra == p || (p.length >= 5 && palavra.startsWith(p)) }
 }
 
 /** Alimento criado à mão com os valores do rótulo (100 g); a regra da água vem do nome. */
