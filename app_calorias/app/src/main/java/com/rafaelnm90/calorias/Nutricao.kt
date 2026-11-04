@@ -545,6 +545,16 @@ fun pesoDepoisDeApagar(pesos: List<Pair<String, Double>>, apagado: String): Doub
     return pesos.dropLast(1).lastOrNull()?.second
 }
 
+/**
+ * Aviso da meta de jejum em Ajustes: acima de 24 h, só com médico. O máximo é 72 h: acima
+ * dele, o Salvar de Ajustes fica com a meta que já estava, e o aviso diz isso.
+ */
+fun avisoDoJejum(horas: Double?): String? = when {
+    horas == null || horas <= 24 -> null
+    horas > 72 -> "O máximo é 72 h. Jejum acima de 24 h, só com acompanhamento médico."
+    else -> "Jejum acima de 24 h, só com acompanhamento médico."
+}
+
 /** Um alimento que a IA achou na foto ou na descrição, com os valores da quantidade estimada. */
 data class ItemEstimado(
     val nome: String,

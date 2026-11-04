@@ -166,7 +166,14 @@ fun AjustesTela() {
                     "Bebida alcoólica e refrigerante somam o volume na meta do dia.",
             )
             CampoNumero(copo, { copo = it }, "Tamanho do copo", sufixo = "ml")
-            CampoNumero(metaJejum, { metaJejum = it }, "Meta de jejum", sufixo = "horas")
+            // O máximo é 72 h (no Salvar); acima de 24 h, só o aviso.
+            CampoNumero(
+                metaJejum,
+                { metaJejum = it },
+                "Meta de jejum",
+                sufixo = "horas",
+                ajuda = avisoDoJejum(lerNumero(metaJejum)),
+            )
         }
 
         Cartao {

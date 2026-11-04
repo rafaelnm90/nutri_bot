@@ -532,4 +532,15 @@ class NutricaoTeste {
         assertFalse(Bebidas.temAlcool("Red Bull Energy Drink"))
         assertTrue(Bebidas.temAlcool("Drink de maracujá"))
     }
+
+    @Test
+    fun avisoDoJejumAcimaDe24Horas() {
+        assertNull(avisoDoJejum(16.0))
+        assertNull(avisoDoJejum(24.0))
+        assertEquals("Jejum acima de 24 h, só com acompanhamento médico.", avisoDoJejum(25.0))
+        assertEquals("Jejum acima de 24 h, só com acompanhamento médico.", avisoDoJejum(72.0))
+        // Acima de 72 h o Salvar não aceita: o aviso diz o máximo.
+        assertEquals("O máximo é 72 h. Jejum acima de 24 h, só com acompanhamento médico.", avisoDoJejum(73.0))
+        assertNull(avisoDoJejum(null))
+    }
 }
