@@ -81,17 +81,18 @@ riscar o antigo com "substituída em DD/MM/AAAA" e registrar o novo abaixo.
 - 04/11/2026: o Sugerir refeição pede à IA que evite o que foi eliminado (bebida com açúcar, embutidos, álcool).
 - 04/11/2026: o cigarro entra na lista do eliminar, conferido por toque, com "não é meu caso", a indicação do tratamento de graça pelo SUS (INCA) e o aviso de que parar costuma trazer uns 4 a 5 kg no primeiro ano (Aubin e outros, BMJ, 2012).
 - 04/11/2026: onde quer chegar: mostra a primeira parada, de 5% a 10% do peso de hoje, quando o peso meta está longe (AHA/ACC/TOS, 2013), e um aviso leve, sem travar, se o peso meta der IMC abaixo de 18,5 (ou de 22 a partir dos 60 anos).
+- 04/11/2026: bebida adoçada feita em casa, fora o café e o chá (suco ou limonada com açúcar, leite com achocolatado), conta como bebida com açúcar (resposta do Rafael: "Conta"; a dose é de refri).
 - 04/11/2026: a semana que acabou de fechar também aceita correção: tocar na linha "Semana passada" abre os 7 dias dela (na segunda-feira, dá para acertar o domingo).
+- 04/11/2026: na montagem, a lista do reduzir começa toda em "Não é meu caso", e ele marca só o que quer reduzir.
 - 04/11/2026: a jornada chega em passos. O passo 1 traz o interruptor em Ajustes, a tela Montar a jornada, o cartão no Diário, a etapa da bebida com açúcar, o aviso do jejum e o Sugerir refeição sem o que foi eliminado. As outras etapas, a conferência dos mantidos, a pausa, o mapa da jornada e os lembretes novos vêm nos próximos.
 
 Padrões da jornada (escolhidos pelo Claude, a confirmar com o Rafael):
 
-- A bebida com açúcar é achada pelo diário: é bebida pelo nome (uma lista da jornada, além das bebidas que o app já reconhece) ou pela marca "pede água". Ficam de fora o álcool e a cerveja sem álcool (a troca sugerida para ele), o zero, diet e light ("zero lactose" e "zero gordura" não contam como zero), a água, a água de coco, o café, o chá feito em casa, o leite puro e o suco 100%. Contam também o suco e a limonada com açúcar feitos em casa e o leite com achocolatado. Conta com 2,5 g de açúcar por 100 ml ou mais ou, sem o açúcar informado, com 5 g de carboidrato por 100 ml ou mais. Um toque no dia vale mais que a conta.
+- A bebida com açúcar é achada pelo diário: é bebida pelo nome (uma lista da jornada, além das bebidas que o app já reconhece) ou pela marca "pede água". Ficam de fora o álcool e a cerveja sem álcool (a troca sugerida para ele), o zero, diet e light ("zero lactose" e "zero gordura" não contam como zero), a água, a água de coco, o café, o chá feito em casa, o leite puro e o suco 100%. Conta com 2,5 g de açúcar por 100 ml ou mais ou, sem o açúcar informado, com 5 g de carboidrato por 100 ml ou mais. Um toque no dia vale mais que a conta.
 - "Outro hábito" nunca aceita como eliminar uma refeição, um grupo inteiro (arroz, feijão, pão, fruta, leite, óleo), o sal ou a água, nem escritos de outro jeito ("cortar o pão", "arroz e feijão", "ficar sem jantar"), e explica o porquê. Reduzir sempre pode.
 - O cartão só aparece no dia de hoje.
 - A pergunta de saúde fica na tela Montar a jornada (aberta por Ajustes ou pelo cartão do Diário, com a jornada ligada): nada começa sem ela e sem a resposta do cigarro.
 - "Onde quer chegar" usa o peso, o peso meta e o objetivo do perfil, sem campos novos: o que mudar ali muda o perfil, e a meta de calorias calculada acompanha. A primeira parada aparece com o peso meta mais de 10% abaixo do peso de hoje.
-- Na montagem, a lista do reduzir começa toda em "Não é meu caso".
 - No modo seguro, os três obrigatórios começam em Reduzir. A bebida com açúcar em Reduzir tem o teto de 1 copo de 200 ml por dia, e o dia só é deslize acima dele.
 - O Sugerir refeição também evita o que está em "Já não faço" e os "Outro hábito" marcados como eliminar.
 - Montar de novo com a mesma etapa e a mesma resposta de saúde guarda o início, os toques e a espera de "Começar a próxima"; mudar a resposta de saúde recomeça a etapa.
