@@ -519,6 +519,138 @@ class NutricaoTeste {
 
     // --- Jornada de hábitos ---
 
+    private fun item(
+        nome: String,
+        kcal: Double,
+        carb: Double,
+        acucar: Double = 0.0,
+        prot: Double = 0.0,
+        gord: Double = 0.0,
+        pedeAgua: Boolean = false,
+        origem: String = ORIGEM_IA,
+    ) = Alimento(nome, kcal, prot, carb, gord, Micros(acucar = acucar), pedeAgua = pedeAgua, origem = origem)
+
+    @Test
+    fun bebidaComAcucarContaAsDaListaDoEliminar() {
+        val contam = listOf(
+            item("Coca-Cola", 42.0, 10.6, acucar = 10.6, pedeAgua = true, origem = ORIGEM_OFF),
+            item("Refrigerante, tipo cola", 34.0, 8.7, pedeAgua = true, origem = ORIGEM_TACO),
+            item("Guaraná Antarctica", 41.0, 10.0, acucar = 10.0, pedeAgua = true),
+            item("Refri", 42.0, 10.6, acucar = 10.6, pedeAgua = true),
+            item("Sukita", 45.0, 11.0, origem = ORIGEM_MEU),
+            item("Água tônica", 37.0, 9.0, acucar = 9.0, pedeAgua = true),
+            item("Néctar de pêssego", 50.0, 12.0, acucar = 11.0, origem = ORIGEM_OFF),
+            item("Suco de caixinha de uva", 55.0, 13.0, acucar = 12.0),
+            item("Suco Del Valle uva", 52.0, 12.5, acucar = 12.0, origem = ORIGEM_OFF),
+            item("Suco de maracujá com açúcar", 50.0, 12.0, acucar = 10.0),
+            item("Refresco em pó", 380.0, 95.0, origem = ORIGEM_MEU),
+            item("Tang laranja", 380.0, 95.0, acucar = 90.0, origem = ORIGEM_OFF),
+            item("Chá pronto de pêssego", 28.0, 7.0, acucar = 6.5, origem = ORIGEM_OFF),
+            item("Chá gelado de pêssego (Leão)", 28.0, 7.0, acucar = 6.0, origem = ORIGEM_OFF),
+            item("Ice tea limão", 30.0, 7.5, acucar = 7.0),
+            item("Achocolatado pronto", 75.0, 12.0, acucar = 10.0, prot = 2.4, gord = 2.0, origem = ORIGEM_OFF),
+            item("Toddynho", 80.0, 13.0, acucar = 11.0, origem = ORIGEM_OFF),
+            item("Bebida láctea, pêssego", 55.0, 9.0, prot = 2.0, gord = 1.3, origem = ORIGEM_TACO),
+            item("Cana, caldo de", 65.0, 18.0, origem = ORIGEM_TACO),
+            item("Caldo de cana", 70.0, 18.0, acucar = 17.0),
+            item("Garapa", 70.0, 18.0, acucar = 17.0),
+            item("Red Bull", 46.0, 11.0, acucar = 11.0, origem = ORIGEM_OFF),
+            item("Energético", 45.0, 11.0, acucar = 11.0),
+            item("Gatorade limão", 24.0, 6.0, acucar = 6.0, origem = ORIGEM_OFF),
+            item("Bebida isotônica, sabores variados", 26.0, 6.4, origem = ORIGEM_TACO),
+            item("Limonada suíça", 45.0, 11.0, acucar = 10.0),
+            item("Leite com achocolatado", 85.0, 12.0, acucar = 10.0, prot = 3.0, gord = 3.0),
+            item("Leite fermentado", 70.0, 15.0, acucar = 13.0, origem = ORIGEM_OFF),
+            item("Iogurte de beber de morango", 75.0, 12.0, acucar = 11.0, origem = ORIGEM_OFF),
+            item("Achocolatado em pó", 380.0, 90.0, acucar = 75.0, origem = ORIGEM_OFF),
+            item("Chocolate quente", 90.0, 13.0, acucar = 11.0, prot = 3.0, gord = 3.0),
+            item("Red Bull Energy Drink", 46.0, 11.0, acucar = 11.0, pedeAgua = true, origem = ORIGEM_OFF),
+            item("Suco natural de laranja com açúcar", 55.0, 13.0, acucar = 12.0),
+            item("Suco de uva", 55.0, 13.0, origem = ORIGEM_MEU),
+            item("Yakult", 70.0, 15.0, acucar = 13.0, origem = ORIGEM_OFF),
+            // "Zero lactose" e "zero gordura" não falam do açúcar.
+            item("Bebida láctea zero lactose sabor morango", 70.0, 11.0, acucar = 10.0, prot = 2.0, gord = 1.5, origem = ORIGEM_OFF),
+            item("Achocolatado pronto zero lactose", 75.0, 12.0, acucar = 10.0, prot = 2.4, gord = 2.0, origem = ORIGEM_OFF),
+            item("Iogurte de beber zero gordura morango", 45.0, 8.0, acucar = 7.5, prot = 3.0, origem = ORIGEM_OFF),
+            // Néctar é adoçado mesmo com "natural" no nome.
+            item("Néctar de uva Natural One", 55.0, 13.0, acucar = 12.0, origem = ORIGEM_OFF),
+            item("Néctar natural de pêssego", 50.0, 12.0, acucar = 11.0),
+            // Chá das marcas de chá pronto.
+            item("Chá Fuze pêssego", 28.0, 7.0, acucar = 7.0),
+            item("Chá Lipton limão", 28.0, 7.0, acucar = 7.0),
+            // Sem álcool, mas doce: só a cerveja sem álcool fica de fora.
+            item("Espumante sem álcool", 45.0, 11.0, acucar = 10.0, pedeAgua = true, origem = ORIGEM_OFF),
+            item("Drink sem álcool de morango", 45.0, 11.0, acucar = 10.0),
+            item("Espumante zero álcool", 45.0, 11.0, acucar = 10.0, pedeAgua = true, origem = ORIGEM_OFF),
+            // Os limites contam (a partir de 2,5 g de açúcar ou, sem ele, de 5 g de carboidrato).
+            item("Refri no limite", 10.0, 2.5, acucar = 2.5, pedeAgua = true),
+            item("Refri só com carboidrato", 20.0, 5.0, pedeAgua = true),
+            // Marca que o nome não diz: é bebida pela marca "pede água" do código de barras.
+            item("Pureza", 40.0, 10.0, acucar = 10.0, pedeAgua = true, origem = ORIGEM_OFF),
+        )
+        contam.forEach { assertTrue(it.nome, Jornada.bebidaComAcucar(it)) }
+    }
+
+    @Test
+    fun bebidaComAcucarDeixaDeForaOZeroOAlcoolOCafeEOSuco100() {
+        val ficamDeFora = listOf(
+            item("Coca-Cola Zero", 0.3, 0.0, pedeAgua = true, origem = ORIGEM_OFF),
+            item("Refri zero", 1.0, 0.1, pedeAgua = true),
+            item("Guaraná Antarctica Zero Açúcar", 1.0, 0.0, pedeAgua = true),
+            item("Pepsi Black", 0.4, 0.0, pedeAgua = true, origem = ORIGEM_OFF),
+            item("Red Bull Sugarfree", 3.0, 0.0, origem = ORIGEM_OFF),
+            item("Monster Ultra", 2.0, 1.0, origem = ORIGEM_OFF),
+            item("Limonada sem açúcar", 8.0, 2.0),
+            item("Água", 0.0, 0.0),
+            item("Água com gás", 0.0, 0.0),
+            item("Água de coco", 22.0, 5.0, acucar = 5.0),
+            item("Coco, água de", 22.0, 5.3, origem = ORIGEM_TACO),
+            item("Café com açúcar", 30.0, 7.0, acucar = 7.0),
+            item("Cappuccino", 60.0, 10.0, acucar = 8.0),
+            item("Chá mate com açúcar", 20.0, 5.0, acucar = 5.0),
+            item("Chá verde", 1.0, 0.2),
+            item("Chá, mate, infusão 5%", 0.0, 0.0, origem = ORIGEM_TACO),
+            item("Leite, de vaca, integral", 61.0, 4.7, origem = ORIGEM_TACO),
+            item("Leite integral (Italac)", 60.0, 4.5, acucar = 4.5, origem = ORIGEM_OFF),
+            item("Suco de laranja", 45.0, 10.4, acucar = 8.4),
+            item("Laranja, pêra, suco", 33.0, 7.6, origem = ORIGEM_TACO),
+            item("Suco de uva integral", 64.0, 16.0, acucar = 16.0, origem = ORIGEM_OFF),
+            item("Suco 100% maçã", 46.0, 11.0, acucar = 10.0, origem = ORIGEM_OFF),
+            item("Suco de laranja natural", 45.0, 10.4, acucar = 8.4),
+            item("Iogurte natural de beber", 60.0, 5.0, acucar = 5.0, origem = ORIGEM_OFF),
+            item("Vitamina de banana", 90.0, 15.0, acucar = 12.0, prot = 3.0, gord = 2.0),
+            item("Bebida de soja original", 40.0, 2.5, acucar = 1.5, origem = ORIGEM_OFF),
+            item("Cerveja, pilsen", 41.0, 3.3, pedeAgua = true, origem = ORIGEM_TACO),
+            item("Cerveja sem álcool", 21.0, 4.8, acucar = 2.9, pedeAgua = true, origem = ORIGEM_OFF),
+            item("Heineken long neck", 42.0, 3.2, pedeAgua = true),
+            item("Catuaba Selvagem", 150.0, 15.0, acucar = 14.0, pedeAgua = true),
+            item("Smirnoff Ice", 70.0, 12.0, acucar = 12.0, pedeAgua = true),
+            item("Caipirinha", 120.0, 15.0, acucar = 14.0, pedeAgua = true),
+            item("Vinho suave", 90.0, 8.0, acucar = 7.0, pedeAgua = true),
+            item("Suco de laranja com vodka", 90.0, 9.0, acucar = 8.0, pedeAgua = true),
+            item("Bolo de laranja", 330.0, 50.0, acucar = 30.0),
+            item("Bala de refresco", 390.0, 95.0, acucar = 70.0),
+            item("Açaí, polpa, com xarope de guaraná e glucose", 110.0, 21.0, origem = ORIGEM_TACO),
+            item("Guaraná em pó", 300.0, 60.0, origem = ORIGEM_MEU),
+            item("Mingau de achocolatado", 120.0, 20.0, acucar = 12.0),
+            item("Açúcar", 387.0, 99.5, acucar = 99.5),
+            item("Arroz, tipo 1, cozido", 128.0, 28.1, origem = ORIGEM_TACO),
+            // O açúcar maior que zero vale mais que o carboidrato.
+            item("Suco de caixinha de goiaba", 50.0, 12.0, acucar = 1.0, origem = ORIGEM_OFF),
+            // Abaixo dos limites.
+            item("Refri abaixo do limite", 10.0, 2.4, acucar = 2.4, pedeAgua = true),
+            item("Refri com pouco carboidrato", 20.0, 4.9, pedeAgua = true),
+            item("Refrigerante diet", 1.0, 0.0, pedeAgua = true),
+            item("Suco de uva sem adição de açúcar", 60.0, 15.0, acucar = 14.0, origem = ORIGEM_OFF),
+            item("Chá pronto 0% açúcar", 1.0, 0.2, origem = ORIGEM_OFF),
+            item("Energético sugar free", 3.0, 0.0),
+            item("Chimarrão", 2.0, 0.4),
+            item("Cerveja zero álcool", 21.0, 4.8, acucar = 2.9, pedeAgua = true, origem = ORIGEM_OFF),
+            item("Chopp sem álcool", 21.0, 4.8, acucar = 2.9, pedeAgua = true),
+        )
+        ficamDeFora.forEach { assertFalse(it.nome, Jornada.bebidaComAcucar(it)) }
+    }
+
     @Test
     fun alcoolSeparadoDoRefriSemMudarAAgua() {
         assertTrue(Bebidas.temAlcool("Cerveja sem álcool"))
@@ -533,6 +665,446 @@ class NutricaoTeste {
         assertTrue(Bebidas.temAlcool("Drink de maracujá"))
     }
 
+    private val coca = item("Coca-Cola", 42.0, 10.6, acucar = 10.6, pedeAgua = true, origem = ORIGEM_OFF)
+
+    /** Um dia lançado: arroz no almoço e, se pedir, uma lata de Coca. */
+    private fun lancado(dia: String, comCoca: Boolean = false) = buildList {
+        add(Registro(0, dia, Refeicao.ALMOCO, tabela[0], 150.0))
+        if (comCoca) add(Registro(0, dia, Refeicao.ALMOCO, coca, 350.0))
+    }
+
+    /** Dias de [de] a [ate] (inclusive), lançados; os de [comCoca] com Coca. */
+    private fun periodo(de: String, ate: String, comCoca: Set<String> = emptySet()): List<Registro> {
+        val fim = LocalDate.parse(ate)
+        return generateSequence(LocalDate.parse(de)) { it.plusDays(1) }.takeWhile { !it.isAfter(fim) }
+            .flatMap { lancado(it.toString(), it.toString() in comCoca) }.toList()
+    }
+
+    private fun progresso(
+        registros: List<Registro>,
+        hoje: String,
+        toques: Map<String, EstadoDia> = emptyMap(),
+        seguro: Boolean = false,
+        inicio: String = "2026-11-02",
+        reduzir: Boolean = false,
+    ) = Jornada.progresso(Habito.BEBIDA_ACUCAR, inicio, hoje, registros, toques, seguro, reduzir)
+
+    @Test
+    fun diaSemRegistroFicaSemDado() {
+        assertEquals(EstadoDia.SEM_DADO, Jornada.estadoPeloDiario(Habito.BEBIDA_ACUCAR, emptyList()))
+        assertEquals(EstadoDia.NA_META, Jornada.estadoPeloDiario(Habito.BEBIDA_ACUCAR, lancado("2026-11-02")))
+        assertEquals(EstadoDia.DESLIZE, Jornada.estadoPeloDiario(Habito.BEBIDA_ACUCAR, lancado("2026-11-02", comCoca = true)))
+    }
+
+    /** Arroz no almoço e [ml] de suco de caixinha (bebida com açúcar), em um ou mais copos. */
+    private fun comSuco(dia: String, vararg ml: Double) = lancado(dia) + ml.map {
+        Registro(0, dia, Refeicao.ALMOCO, item("Suco de caixinha de uva", 55.0, 13.0, acucar = 12.0), it)
+    }
+
+    @Test
+    fun emReduzirODiaContaOTetoDe200Ml() {
+        val b = Habito.BEBIDA_ACUCAR
+        // Em Reduzir (modo seguro), até 200 ml no dia ficam dentro do teto, somando os copos.
+        assertEquals(EstadoDia.NA_META, Jornada.estadoPeloDiario(b, comSuco("2026-11-02", 150.0), reduzir = true))
+        assertEquals(EstadoDia.NA_META, Jornada.estadoPeloDiario(b, comSuco("2026-11-02", 200.0), reduzir = true))
+        assertEquals(EstadoDia.DESLIZE, Jornada.estadoPeloDiario(b, comSuco("2026-11-02", 250.0), reduzir = true))
+        assertEquals(EstadoDia.DESLIZE, Jornada.estadoPeloDiario(b, comSuco("2026-11-02", 150.0, 100.0), reduzir = true))
+        assertEquals(EstadoDia.DESLIZE, Jornada.estadoPeloDiario(b, lancado("2026-11-02", comCoca = true), reduzir = true))
+        assertEquals(EstadoDia.SEM_DADO, Jornada.estadoPeloDiario(b, emptyList(), reduzir = true))
+        // Em Eliminar, qualquer gole é deslize.
+        assertEquals(EstadoDia.DESLIZE, Jornada.estadoPeloDiario(b, comSuco("2026-11-02", 150.0)))
+        // O progresso repassa o Reduzir para os dias e para os textos.
+        val r = comSuco("2026-11-02", 200.0) + comSuco("2026-11-03", 350.0) + comSuco("2026-11-04", 150.0)
+        val p = progresso(r, hoje = "2026-11-04", seguro = true, reduzir = true)
+        assertEquals(listOf(EstadoDia.NA_META, EstadoDia.DESLIZE, EstadoDia.NA_META), p.atual.dias.take(3).map { it.estado })
+        assertEquals("Hoje, até agora: dentro do teto ✅", Jornada.textoHoje(p, seguro = true))
+        assertEquals("Hoje: passou do teto 🔸", Jornada.textoHoje(progresso(r, hoje = "2026-11-03", seguro = true, reduzir = true), seguro = true))
+        assertEquals("passou do teto", Jornada.rotuloDoDia(b, EstadoDia.DESLIZE, reduzir = true))
+        assertTrue(Jornada.legendaDaSemana(b, reduzir = true).startsWith("✅ dentro do teto, 🔸 passou do teto, "))
+        // Só a etapa marcada em Reduzir usa o teto.
+        val seguro = Jornada.montar(JornadaSalva(ligada = true), true, Jornada.escolhasIniciais(true), emptyList(), "2026-11-02")
+        assertTrue(Jornada.emReduzir(seguro))
+        assertFalse(Jornada.emReduzir(montada()))
+    }
+
+    @Test
+    fun semanaBoaCom5DiasLancadosE1DeslizePerdoado() {
+        // Etapa começou numa segunda, 02/11; a semana 1 vai até domingo, 08/11.
+        val p = progresso(periodo("2026-11-02", "2026-11-06", comCoca = setOf("2026-11-04")), hoje = "2026-11-09")
+        val semana1 = p.ultimaCompleta!!
+        assertEquals(1, semana1.numero)
+        assertEquals(EstadoSemana.BOA, semana1.estado)
+        assertEquals(5, semana1.diasComDado)
+        assertEquals(1, semana1.deslizes)
+        assertEquals(1, p.seguidas)
+        assertNull(p.vencidaEm)
+        assertEquals(2, p.atual.numero)
+    }
+
+    @Test
+    fun doisDeslizesNaSemanaZeramAsSeguidas() {
+        val r = periodo("2026-11-02", "2026-11-15", comCoca = setOf("2026-11-09", "2026-11-10"))
+        val p = progresso(r, hoje = "2026-11-16")
+        assertEquals(EstadoSemana.RUIM, p.ultimaCompleta!!.estado)
+        assertEquals(0, p.seguidas)
+        assertNull(p.vencidaEm)
+    }
+
+    @Test
+    fun semanaComMenosDe5DiasLancadosSoEspera() {
+        // Semana 1 boa, semana 2 com 4 dias lançados (sem dado), semana 3 boa: vence no fim da 3.
+        val r = periodo("2026-11-02", "2026-11-06") + periodo("2026-11-09", "2026-11-12") + periodo("2026-11-16", "2026-11-20")
+        val p = progresso(r, hoje = "2026-11-23")
+        assertEquals(EstadoSemana.SEM_DADO, progresso(r, hoje = "2026-11-16").ultimaCompleta!!.estado)
+        assertEquals(2, p.seguidas)
+        assertEquals("2026-11-22", p.vencidaEm)
+    }
+
+    @Test
+    fun duasSemanasBoasSeguidasVencemAEtapa() {
+        val p = progresso(periodo("2026-11-02", "2026-11-15"), hoje = "2026-11-16")
+        assertEquals(2, p.seguidas)
+        assertEquals("2026-11-15", p.vencidaEm)
+    }
+
+    @Test
+    fun soSemanaCompletaConta() {
+        // No último dia da semana 2 ela ainda está em curso: a vitória só aparece no dia seguinte.
+        val r = periodo("2026-11-02", "2026-11-15")
+        val noDomingo = progresso(r, hoje = "2026-11-15")
+        assertEquals(EstadoSemana.EM_CURSO, noDomingo.atual.estado)
+        assertEquals(1, noDomingo.seguidas)
+        assertNull(noDomingo.vencidaEm)
+        assertEquals("2026-11-15", progresso(r, hoje = "2026-11-16").vencidaEm)
+    }
+
+    @Test
+    fun semanaRuimNoMeioRecomecaAContagem() {
+        val r = periodo("2026-11-02", "2026-11-22", comCoca = setOf("2026-11-10", "2026-11-12"))
+        val p = progresso(r, hoje = "2026-11-23")
+        assertEquals(1, p.seguidas)
+        assertNull(p.vencidaEm)
+    }
+
+    @Test
+    fun toqueValeMaisQueODiario() {
+        // 02 e 03 com Coca pelo diário: 2 deslizes. O toque no dia 02 diz que foi isotônico no treino.
+        val r = periodo("2026-11-02", "2026-11-06", comCoca = setOf("2026-11-02", "2026-11-03"))
+        assertEquals(EstadoSemana.RUIM, progresso(r, hoje = "2026-11-09").ultimaCompleta!!.estado)
+        val corrigido = progresso(r, hoje = "2026-11-09", toques = mapOf("2026-11-02" to EstadoDia.NA_META))
+        assertEquals(EstadoSemana.BOA, corrigido.ultimaCompleta!!.estado)
+        val dia2 = corrigido.ultimaCompleta!!.dias[0]
+        assertEquals(EstadoDia.NA_META, dia2.estado)
+        assertEquals(EstadoDia.DESLIZE, dia2.peloDiario)
+        assertTrue(dia2.tocado)
+        // Toque num dia sem nada lançado faz o dia contar: 4 dias lançados + 1 tocado = semana boa.
+        val quatro = periodo("2026-11-02", "2026-11-05")
+        assertEquals(EstadoSemana.SEM_DADO, progresso(quatro, hoje = "2026-11-09").ultimaCompleta!!.estado)
+        val comToque = progresso(quatro, hoje = "2026-11-09", toques = mapOf("2026-11-07" to EstadoDia.NA_META))
+        assertEquals(EstadoSemana.BOA, comToque.ultimaCompleta!!.estado)
+    }
+
+    @Test
+    fun lancarEmDiaPassadoMudaAConta() {
+        // Nada é contador gravado: a semana 2 tinha 4 dias; lançar o dia 13 depois faz ela boa.
+        val antes = periodo("2026-11-02", "2026-11-12")
+        assertNull(progresso(antes, hoje = "2026-11-16").vencidaEm)
+        assertEquals("2026-11-15", progresso(antes + lancado("2026-11-13"), hoje = "2026-11-16").vencidaEm)
+    }
+
+    @Test
+    fun modoSeguroNaoContaSemanas() {
+        val p = progresso(periodo("2026-11-02", "2026-11-15"), hoje = "2026-11-16", seguro = true)
+        assertEquals(0, p.seguidas)
+        assertNull(p.vencidaEm)
+        assertEquals(EstadoSemana.BOA, p.ultimaCompleta!!.estado)
+    }
+
+    @Test
+    fun semanaAtualTemSeteDiasEOsFuturosNaoContam() {
+        val p = progresso(
+            periodo("2026-11-02", "2026-11-04"),
+            hoje = "2026-11-04",
+            toques = mapOf("2026-11-06" to EstadoDia.DESLIZE),
+        )
+        assertEquals(7, p.atual.dias.size)
+        assertEquals("2026-11-02", p.atual.dias.first().dia)
+        assertEquals("2026-11-08", p.atual.dias.last().dia)
+        assertEquals(listOf(false, false, false, true, true, true, true), p.atual.dias.map { it.futuro })
+        assertEquals(EstadoDia.SEM_DADO, p.atual.dias[4].estado)
+        assertEquals("2026-11-04", p.hoje.dia)
+        assertEquals(EstadoDia.NA_META, p.hoje.estado)
+        assertNull(p.ultimaCompleta)
+        assertEquals(0, p.seguidas)
+    }
+
+    @Test
+    fun relogioAntesDoInicioFicaNoPrimeiroDia() {
+        val p = progresso(emptyList(), hoje = "2026-11-01")
+        assertEquals(1, p.atual.numero)
+        assertEquals("2026-11-02", p.hoje.dia)
+    }
+
+    @Test
+    fun semanaComPoucosDiasEDoisDeslizesSoEspera() {
+        // Semana 2 com 4 dias lançados e 2 com Coca: fica sem dado e não zera a semana 1.
+        val r = periodo("2026-11-02", "2026-11-06") +
+            periodo("2026-11-09", "2026-11-12", comCoca = setOf("2026-11-09", "2026-11-10")) +
+            periodo("2026-11-16", "2026-11-20")
+        assertEquals(EstadoSemana.SEM_DADO, progresso(r, hoje = "2026-11-16").ultimaCompleta!!.estado)
+        assertEquals("2026-11-22", progresso(r, hoje = "2026-11-23").vencidaEm)
+    }
+
+    @Test
+    fun semanaRuimDepoisDaVitoriaNaoApagaAVitoria() {
+        val p = progresso(periodo("2026-11-02", "2026-11-22", comCoca = setOf("2026-11-16", "2026-11-17")), hoje = "2026-11-23")
+        assertEquals(2, p.seguidas)
+        assertEquals("2026-11-15", p.vencidaEm)
+    }
+
+    @Test
+    fun toqueSemDadoOuForaDaEtapaNaoMudaNada() {
+        val r = periodo("2026-11-02", "2026-11-05")
+        assertEquals(4, progresso(r, hoje = "2026-11-09", toques = mapOf("2026-11-03" to EstadoDia.SEM_DADO)).ultimaCompleta!!.diasComDado)
+        assertEquals(
+            EstadoSemana.SEM_DADO,
+            progresso(r, hoje = "2026-11-09", toques = mapOf("2026-11-01" to EstadoDia.NA_META)).ultimaCompleta!!.estado,
+        )
+        // O toque de deslize num dia que o diário diz limpo também vale mais.
+        val comUmaCoca = periodo("2026-11-02", "2026-11-06", comCoca = setOf("2026-11-02"))
+        assertEquals(
+            EstadoSemana.RUIM,
+            progresso(comUmaCoca, hoje = "2026-11-09", toques = mapOf("2026-11-03" to EstadoDia.DESLIZE)).ultimaCompleta!!.estado,
+        )
+    }
+
+    private fun montada(escolhas: Map<Habito, Escolha> = Jornada.escolhasIniciais(false) + (Habito.CIGARRO to Escolha.NAO_E_MEU_CASO)) =
+        Jornada.montar(JornadaSalva(ligada = true), seguro = false, escolhas = escolhas, outros = emptyList(), hoje = "2026-11-02")
+
+    @Test
+    fun montarComecaAEtapaDaBebidaHoje() {
+        val j = montada()
+        assertTrue(j.montada)
+        assertEquals(Habito.BEBIDA_ACUCAR, j.etapa)
+        assertEquals("2026-11-02", j.inicioEtapa)
+        assertFalse(j.aguardando)
+        assertEquals(MomentoDaJornada.EM_CURSO, Jornada.momento(j))
+        assertEquals(Escolha.ELIMINAR, j.escolhas[Habito.EMBUTIDOS])
+        assertEquals(Escolha.NAO_E_MEU_CASO, j.escolhas[Habito.DOCES])
+        assertEquals(MomentoDaJornada.MONTAR, Jornada.momento(JornadaSalva(ligada = true)))
+    }
+
+    @Test
+    fun jaNaoFacoComecaComoMantidoSemEtapa() {
+        val e = Jornada.escolhasIniciais(false) + mapOf(
+            Habito.BEBIDA_ACUCAR to Escolha.JA_NAO_FACO,
+            Habito.ALCOOL to Escolha.JA_NAO_FACO,
+            Habito.CIGARRO to Escolha.NAO_E_MEU_CASO,
+        )
+        val j = montada(e)
+        assertNull(j.etapa)
+        assertNull(j.inicioEtapa)
+        assertEquals(MomentoDaJornada.SEM_ETAPA, Jornada.momento(j))
+        assertEquals(listOf(Habito.BEBIDA_ACUCAR, Habito.ALCOOL), Jornada.mantidos(j))
+    }
+
+    @Test
+    fun montarDeNovoGuardaAEtapaEOsToques() {
+        val j = Jornada.comToque(montada(), "2026-11-03", Habito.BEBIDA_ACUCAR, EstadoDia.NA_META)
+        val de = Jornada.montar(j, false, j.escolhas + (Habito.DOCES to Escolha.REDUZIR), emptyList(), "2026-11-10")
+        assertEquals("2026-11-02", de.inicioEtapa)
+        assertEquals(j.toques, de.toques)
+        assertEquals(Escolha.REDUZIR, de.escolhas[Habito.DOCES])
+        // Trocar a bebida para "Já não faço" encerra a etapa e apaga os toques; a vitória fica.
+        val vencida = Jornada.comVitoria(j, Habito.BEBIDA_ACUCAR, "2026-11-15")
+        val semBebida = Jornada.montar(vencida, false, vencida.escolhas + (Habito.BEBIDA_ACUCAR to Escolha.JA_NAO_FACO), emptyList(), "2026-11-20")
+        assertNull(semBebida.etapa)
+        assertTrue(semBebida.toques.isEmpty())
+        assertFalse(semBebida.aguardando)
+        assertEquals(listOf(Vencida(Habito.BEBIDA_ACUCAR, "2026-11-15")), semBebida.vencidas)
+        // Voltar a eliminar uma etapa já vencida não conta de novo: fica esperando a próxima.
+        val deVolta = Jornada.montar(semBebida, false, semBebida.escolhas + (Habito.BEBIDA_ACUCAR to Escolha.ELIMINAR), emptyList(), "2026-11-21")
+        assertTrue(deVolta.aguardando)
+        assertEquals(MomentoDaJornada.VENCIDA, Jornada.momento(deVolta))
+    }
+
+    @Test
+    fun mudarARespostaDeSaudeRecomecaAEtapa() {
+        // As semanas do modo seguro não foram contadas e tinham outra meta: trocar a resposta recomeça a etapa.
+        val e = Jornada.escolhasIniciais(true) + (Habito.CIGARRO to Escolha.NAO_E_MEU_CASO)
+        val seguro = Jornada.comToque(
+            Jornada.montar(JornadaSalva(ligada = true), true, e, emptyList(), "2026-11-02"),
+            "2026-11-03", Habito.BEBIDA_ACUCAR, EstadoDia.NA_META,
+        )
+        val semModoSeguro = Jornada.montar(seguro, false, e, emptyList(), "2026-11-16")
+        assertEquals("2026-11-16", semModoSeguro.inicioEtapa)
+        assertTrue(semModoSeguro.toques.isEmpty())
+        assertFalse(Jornada.continuaAEtapa(seguro, Habito.BEBIDA_ACUCAR, seguro = false))
+        // Com a mesma resposta, a etapa continua de onde estava.
+        val deNovo = Jornada.montar(seguro, true, e, emptyList(), "2026-11-16")
+        assertEquals("2026-11-02", deNovo.inicioEtapa)
+        assertEquals(seguro.toques, deNovo.toques)
+        assertTrue(Jornada.continuaAEtapa(seguro, Habito.BEBIDA_ACUCAR, seguro = true))
+    }
+
+    @Test
+    fun montarNaoGuardaOutroHabitoQueNaoPodeSerEliminado() {
+        val outros = listOf(
+            OutroHabito("Arroz", Escolha.ELIMINAR),
+            OutroHabito("Pipoca", Escolha.ELIMINAR),
+            OutroHabito("Pão", Escolha.REDUZIR),
+        )
+        val j = Jornada.montar(JornadaSalva(ligada = true), false, montada().escolhas, outros, "2026-11-02")
+        assertEquals(listOf(OutroHabito("Pipoca", Escolha.ELIMINAR), OutroHabito("Pão", Escolha.REDUZIR)), j.outros)
+        assertFalse("Arroz" in Jornada.evitarNaSugestao(j))
+        assertTrue("Pipoca" in Jornada.evitarNaSugestao(j))
+    }
+
+    @Test
+    fun obrigatorioSemCadeadoSoNoModoSeguro() {
+        assertEquals(listOf(Escolha.ELIMINAR, Escolha.JA_NAO_FACO), Jornada.opcoes(Habito.BEBIDA_ACUCAR, seguro = false))
+        assertEquals(listOf(Escolha.ELIMINAR, Escolha.REDUZIR, Escolha.JA_NAO_FACO), Jornada.opcoes(Habito.BEBIDA_ACUCAR, seguro = true))
+        assertEquals(listOf(Escolha.ELIMINAR, Escolha.NAO_E_MEU_CASO), Jornada.opcoes(Habito.CIGARRO, seguro = true))
+        assertEquals(Escolha.ELIMINAR, Jornada.escolhaInicial(Habito.ALCOOL, seguro = false))
+        assertEquals(Escolha.REDUZIR, Jornada.escolhaInicial(Habito.ALCOOL, seguro = true))
+        assertNull(Jornada.escolhaInicial(Habito.CIGARRO, seguro = false))
+        // Reduzir num obrigatório fora do modo seguro vira Eliminar.
+        val v = Jornada.escolhasValidas(mapOf(Habito.BEBIDA_ACUCAR to Escolha.REDUZIR), seguro = false)
+        assertEquals(Escolha.ELIMINAR, v[Habito.BEBIDA_ACUCAR])
+        assertNull(v[Habito.CIGARRO])
+        // Mudar a resposta de saúde: os obrigatórios voltam à marcação do modo; "Já não faço" fica.
+        val s = Jornada.aoMudarSaude(
+            mapOf(Habito.BEBIDA_ACUCAR to Escolha.ELIMINAR, Habito.ALCOOL to Escolha.JA_NAO_FACO, Habito.DOCES to Escolha.ELIMINAR),
+            seguro = true,
+        )
+        assertEquals(Escolha.REDUZIR, s[Habito.BEBIDA_ACUCAR])
+        assertEquals(Escolha.JA_NAO_FACO, s[Habito.ALCOOL])
+        assertEquals(Escolha.REDUZIR, s[Habito.EMBUTIDOS])
+        assertEquals(Escolha.ELIMINAR, s[Habito.DOCES])
+        val seguro = Jornada.montar(JornadaSalva(ligada = true), true, Jornada.escolhasIniciais(true), emptyList(), "2026-11-02")
+        assertEquals(Escolha.REDUZIR, seguro.escolhas[Habito.BEBIDA_ACUCAR])
+        assertEquals(Habito.BEBIDA_ACUCAR, seguro.etapa)
+        assertTrue(seguro.seguro)
+    }
+
+    @Test
+    fun rotulosDosBotoes() {
+        assertEquals("Vou eliminar", Jornada.rotulo(Habito.BEBIDA_ACUCAR, Escolha.ELIMINAR, seguro = false))
+        assertEquals("Eliminar", Jornada.rotulo(Habito.BEBIDA_ACUCAR, Escolha.ELIMINAR, seguro = true))
+        assertEquals("Já não faço", Jornada.rotulo(Habito.ALCOOL, Escolha.JA_NAO_FACO, seguro = false))
+        assertEquals("Vou parar", Jornada.rotulo(Habito.CIGARRO, Escolha.ELIMINAR, seguro = false))
+        assertEquals("Não é meu caso", Jornada.rotulo(Habito.CIGARRO, Escolha.NAO_E_MEU_CASO, seguro = false))
+        assertEquals("Reduzir", Jornada.rotulo(Habito.DOCES, Escolha.REDUZIR, seguro = false))
+    }
+
+    @Test
+    fun faltaResponderSaudeECigarro() {
+        val semCigarro = Jornada.escolhasIniciais(false)
+        val comCigarro = semCigarro + (Habito.CIGARRO to Escolha.ELIMINAR)
+        assertEquals("Responda à pergunta de saúde e à do cigarro para começar.", Jornada.faltaResponder(null, semCigarro))
+        assertEquals("Responda à pergunta de saúde para começar.", Jornada.faltaResponder(null, comCigarro))
+        assertEquals("Responda à pergunta do cigarro para começar.", Jornada.faltaResponder(false, semCigarro))
+        assertNull(Jornada.faltaResponder(true, comCigarro))
+    }
+
+    @Test
+    fun toqueTrocaEApagaACorrecaoDoDia() {
+        var j = montada()
+        j = Jornada.comToque(j, "2026-11-03", Habito.BEBIDA_ACUCAR, EstadoDia.DESLIZE)
+        j = Jornada.comToque(j, "2026-11-03", Habito.BEBIDA_ACUCAR, EstadoDia.NA_META)
+        assertEquals(mapOf("2026-11-03" to EstadoDia.NA_META), Jornada.toquesDo(j, Habito.BEBIDA_ACUCAR))
+        j = Jornada.comToque(j, "2026-11-03", Habito.BEBIDA_ACUCAR, null)
+        assertTrue(j.toques.isEmpty())
+        j = Jornada.comToque(j, "2026-11-04", Habito.BEBIDA_ACUCAR, EstadoDia.SEM_DADO)
+        assertTrue(j.toques.isEmpty())
+    }
+
+    @Test
+    fun vitoriaGravadaUmaVezSoEEsperaComecarAProxima() {
+        val j = Jornada.comVitoria(montada(), Habito.BEBIDA_ACUCAR, "2026-11-15")
+        assertTrue(j.aguardando)
+        assertEquals(MomentoDaJornada.VENCIDA, Jornada.momento(j))
+        assertEquals(j, Jornada.comVitoria(j, Habito.BEBIDA_ACUCAR, "2026-11-20"))
+        assertEquals(listOf(Habito.BEBIDA_ACUCAR), Jornada.mantidos(j))
+        // Só a etapa em curso vence.
+        assertEquals(montada(), Jornada.comVitoria(montada(), Habito.ALCOOL, "2026-11-15"))
+    }
+
+    @Test
+    fun outroHabitoNuncaEliminaRefeicaoGrupoSalOuAgua() {
+        assertEquals(Bloqueio.REFEICAO, Jornada.bloqueioDeEliminar("jantar"))
+        assertEquals(Bloqueio.REFEICAO, Jornada.bloqueioDeEliminar("Pular o café da manhã"))
+        assertEquals(Bloqueio.REFEICAO, Jornada.bloqueioDeEliminar("lanche da tarde"))
+        assertNull(Jornada.bloqueioDeEliminar("comer depois do jantar"))
+        assertNull(Jornada.bloqueioDeEliminar("lanche de rua"))
+        assertEquals(Bloqueio.GRUPO, Jornada.bloqueioDeEliminar("Pão"))
+        assertEquals(Bloqueio.GRUPO, Jornada.bloqueioDeEliminar("sem arroz"))
+        assertEquals(Bloqueio.GRUPO, Jornada.bloqueioDeEliminar("Frutas"))
+        assertEquals(Bloqueio.GRUPO, Jornada.bloqueioDeEliminar("glúten"))
+        assertEquals(Bloqueio.GRUPO, Jornada.bloqueioDeEliminar("leite"))
+        assertNull(Jornada.bloqueioDeEliminar("pão de queijo"))
+        assertEquals(Bloqueio.SAL, Jornada.bloqueioDeEliminar("sal"))
+        assertEquals(Bloqueio.SAL, Jornada.bloqueioDeEliminar("Sal grosso"))
+        assertNull(Jornada.bloqueioDeEliminar("Bolacha água e sal"))
+        assertNull(Jornada.bloqueioDeEliminar("salgadinho"))
+        assertEquals(Bloqueio.AGUA, Jornada.bloqueioDeEliminar("água"))
+        assertEquals(Bloqueio.AGUA, Jornada.bloqueioDeEliminar("Água com gás"))
+        assertNull(Jornada.bloqueioDeEliminar("água de coco"))
+        assertNull(Jornada.bloqueioDeEliminar("Água tônica"))
+        assertNull(Jornada.bloqueioDeEliminar("chocolate"))
+        assertNull(Jornada.bloqueioDeEliminar(""))
+    }
+
+    @Test
+    fun outroHabitoBarraOCorteEscritoDoJeitoComum() {
+        listOf(
+            "arroz e feijão", "cortar o pão", "tirar o arroz", "parar de comer pão", "evitar arroz", "nada de pão",
+            "não comer arroz", "todo tipo de pão", "qualquer fruta", "carboidratos em geral", "leite e derivados",
+        ).forEach { assertEquals(it, Bloqueio.GRUPO, Jornada.bloqueioDeEliminar(it)) }
+        listOf("cortar o sal", "tirar o sal", "usar sal").forEach { assertEquals(it, Bloqueio.SAL, Jornada.bloqueioDeEliminar(it)) }
+        assertEquals(Bloqueio.AGUA, Jornada.bloqueioDeEliminar("cortar a água"))
+        listOf("deixar de jantar", "ficar sem jantar", "o jantar todo dia", "lanche da manhã").forEach {
+            assertEquals(it, Bloqueio.REFEICAO, Jornada.bloqueioDeEliminar(it))
+        }
+        listOf(
+            "pão de queijo", "comer depois do jantar", "lanche de rua", "Bolacha água e sal", "água de coco",
+            "zero açúcar", "chocolate", "parar de tomar refri", "nada de doce",
+        ).forEach { assertNull(it, Jornada.bloqueioDeEliminar(it)) }
+    }
+
+    @Test
+    fun primeiraParadaQuandoAMetaEstaLonge() {
+        val p = Jornada.primeiraParada(100.0, 85.0, Objetivo.PERDER)!!
+        assertEquals(95.0, p.first, 0.001)
+        assertEquals(90.0, p.second, 0.001)
+        assertNull(Jornada.primeiraParada(100.0, 90.0, Objetivo.PERDER))
+        assertNull(Jornada.primeiraParada(100.0, 92.0, Objetivo.PERDER))
+        assertNull(Jornada.primeiraParada(100.0, 85.0, Objetivo.MANTER))
+        assertNull(Jornada.primeiraParada(0.0, 85.0, Objetivo.PERDER))
+        assertNull(Jornada.primeiraParada(100.0, 0.0, Objetivo.PERDER))
+    }
+
+    @Test
+    fun avisoDeImcBaixoNaMetaSemTravar() {
+        // Com uma casa, para o lado do aviso: o IMC para baixo e o peso mínimo para cima.
+        val a = Jornada.avisoImc(55.0, 175.0, idade = 36)!!
+        assertEquals(17.9, a.imc, 0.001)
+        assertEquals(18.5, a.minimo, 0.0)
+        assertEquals(56.7, a.pesoMinimoKg, 0.001)
+        assertNull(Jornada.avisoImc(60.0, 175.0, idade = 36))
+        val idoso = Jornada.avisoImc(65.0, 175.0, idade = 60)!!
+        assertEquals(22.0, idoso.minimo, 0.0)
+        assertEquals(67.4, idoso.pesoMinimoKg, 0.001)
+        // 54,7 kg em 1,72 m dá IMC 18,49: a tela não pode mostrar "18,5, abaixo de 18,5" nem um mínimo que ainda avisa.
+        val quase = Jornada.avisoImc(54.7, 172.0, idade = 36)!!
+        assertEquals(18.4, quase.imc, 0.001)
+        assertEquals(54.8, quase.pesoMinimoKg, 0.001)
+        assertNull(Jornada.avisoImc(54.8, 172.0, idade = 36))
+        assertNull(Jornada.avisoImc(65.0, 175.0, idade = 59))
+        assertNull(Jornada.avisoImc(60.0, 0.0, idade = 30))
+        assertNull(Jornada.avisoImc(0.0, 175.0, idade = 30))
+    }
+
     @Test
     fun avisoDoJejumAcimaDe24Horas() {
         assertNull(avisoDoJejum(16.0))
@@ -542,5 +1114,175 @@ class NutricaoTeste {
         // Acima de 72 h o Salvar não aceita: o aviso diz o máximo.
         assertEquals("O máximo é 72 h. Jejum acima de 24 h, só com acompanhamento médico.", avisoDoJejum(73.0))
         assertNull(avisoDoJejum(null))
+    }
+
+    @Test
+    fun cartaoSemVermelhoESemFalhou() {
+        val dias = progresso(periodo("2026-11-02", "2026-11-04", comCoca = setOf("2026-11-03")), hoje = "2026-11-05").atual.dias
+        val simbolos = dias.map { Jornada.simboloDoDia(it) }
+        assertEquals(listOf("✅", "🔸", "✅", "⚪", "·", "·", "·"), simbolos)
+        assertEquals("teve bebida com açúcar", Jornada.rotuloDoDia(Habito.BEBIDA_ACUCAR, EstadoDia.DESLIZE))
+        // A água do copo e os exercícios não contam: o texto diz "nas refeições".
+        assertEquals("nada lançado nas refeições", Jornada.rotuloDoDia(Habito.BEBIDA_ACUCAR, EstadoDia.SEM_DADO))
+        // O "·" é o dia que ainda não chegou: a legenda separa por vírgula e explica o ponto.
+        assertEquals(
+            "✅ sem bebida com açúcar, 🔸 teve, ⚪ nada lançado nas refeições, · ainda não chegou. Toque num dia para corrigir.",
+            Jornada.legendaDaSemana(Habito.BEBIDA_ACUCAR),
+        )
+        assertEquals(listOf("S", "Q", "D"), listOf("2026-11-02", "2026-11-04", "2026-11-08").map { Jornada.letraDoDia(it) })
+
+        // Todos os textos do cartão e da montagem, em todos os momentos: nada de "falhou" nem de ❌.
+        val j = montada()
+        val seguroReduzir = j.copy(seguro = true, escolhas = j.escolhas + (Habito.BEBIDA_ACUCAR to Escolha.REDUZIR))
+        val semCoca = periodo("2026-11-02", "2026-11-15")
+        val progressos = listOf(
+            progresso(semCoca, hoje = "2026-11-16"),
+            progresso(periodo("2026-11-02", "2026-11-16", comCoca = setOf("2026-11-09", "2026-11-10", "2026-11-16")), hoje = "2026-11-16"),
+            progresso(periodo("2026-11-02", "2026-11-03", comCoca = setOf("2026-11-02", "2026-11-03")), hoje = "2026-11-03"),
+            progresso(periodo("2026-11-02", "2026-11-02"), hoje = "2026-11-09"),
+            progresso(emptyList(), hoje = "2026-11-02", toques = mapOf("2026-11-02" to EstadoDia.DESLIZE)),
+            progresso(comSuco("2026-11-02", 300.0), hoje = "2026-11-02", seguro = true, reduzir = true),
+        )
+        val dosProgressos = progressos.flatMap { p ->
+            listOf(Jornada.textoHoje(p, seguro = false), Jornada.textoHoje(p, seguro = true)) +
+                listOfNotNull(p.ultimaCompleta?.let { Jornada.textoSemanaPassada(it, Habito.BEBIDA_ACUCAR) })
+        }
+        val daMontagem = listOf(null, Habito.BEBIDA_ACUCAR).flatMap { etapa ->
+            listOf(false, true).flatMap { seguro ->
+                listOf(false, true).flatMap { continua ->
+                    listOf(false, true).map { vencida -> Jornada.textoDaEtapaNaMontagem(etapa, seguro, continua, vencida) }
+                }
+            }
+        }
+        val semCigarro = Jornada.escolhasIniciais(false)
+        val falta = listOfNotNull(
+            Jornada.faltaResponder(null, semCigarro),
+            Jornada.faltaResponder(null, semCigarro + (Habito.CIGARRO to Escolha.ELIMINAR)),
+            Jornada.faltaResponder(false, semCigarro),
+        )
+        val dosDias = EstadoDia.entries.flatMap { e ->
+            Habito.entries.flatMap { h -> listOf(Jornada.rotuloDoDia(h, e), Jornada.rotuloDoDia(h, e, reduzir = true)) }
+        }
+        val legendas = Habito.entries.flatMap { h -> listOf(Jornada.legendaDaSemana(h), Jornada.legendaDaSemana(h, reduzir = true)) }
+        val textos = Habito.entries.flatMap { listOf(it.titulo, it.oQueConta, it.motivo, it.teto, it.fonte, it.troca) } +
+            Bloqueio.entries.map { it.explicacao } +
+            listOf(
+                Jornada.PERGUNTA_SAUDE, Jornada.TEXTO_MODO_SEGURO, Jornada.TEXTO_MODO_SEGURO_CARTAO,
+                Jornada.TEXTO_RESPOSTA_SAUDE, Jornada.TEXTO_SUS, Jornada.TEXTO_PESO_CIGARRO, Jornada.TEXTO_LALLY,
+                Jornada.TEXTO_PROXIMA_VERSAO, Jornada.textoMeta(j), Jornada.textoMeta(j.copy(seguro = true)),
+                Jornada.textoMeta(seguroReduzir),
+            ) +
+            listOfNotNull(Jornada.textoMantidos(Jornada.comVitoria(j, Habito.BEBIDA_ACUCAR, "2026-11-15"))) +
+            dosProgressos + daMontagem + falta + dosDias + legendas
+        textos.forEach { t -> assertFalse(t, t.contains("falh", ignoreCase = true) || t.contains("❌")) }
+    }
+
+    @Test
+    fun preferenciasDaJornadaIdaEVolta() {
+        val e = Jornada.escolhasIniciais(false) + (Habito.CIGARRO to Escolha.NAO_E_MEU_CASO)
+        assertEquals(e, Jornada.escolhasDeTexto(Jornada.escolhasParaTexto(e)))
+        val o = listOf(OutroHabito("Pão \"francês\"", Escolha.REDUZIR), OutroHabito("Pipoca", Escolha.ELIMINAR))
+        assertEquals(o, Jornada.outrosDeTexto(Jornada.outrosParaTexto(o)))
+        val v = listOf(Vencida(Habito.BEBIDA_ACUCAR, "2026-11-15"))
+        assertEquals(v, Jornada.vencidasDeTexto(Jornada.vencidasParaTexto(v)))
+        val t = listOf(Toque("2026-11-03", Habito.BEBIDA_ACUCAR, EstadoDia.NA_META), Toque("2026-11-04", Habito.BEBIDA_ACUCAR, EstadoDia.DESLIZE))
+        assertEquals(t, Jornada.toquesDeTexto(Jornada.toquesParaTexto(t)))
+        // Texto vazio, quebrado ou com id que o app não conhece não derruba nada.
+        assertTrue(Jornada.escolhasDeTexto(null).isEmpty())
+        assertTrue(Jornada.toquesDeTexto("{quebrado").isEmpty())
+        assertEquals(
+            mapOf(Habito.DOCES to Escolha.REDUZIR),
+            Jornada.escolhasDeTexto("""{"doces":"reduzir","habito_novo":"eliminar","alcool":"talvez"}"""),
+        )
+        assertEquals(
+            listOf(Toque("2026-11-03", Habito.BEBIDA_ACUCAR, EstadoDia.DESLIZE)),
+            Jornada.toquesDeTexto(
+                """[{"dia":"2026-11-03","habito":"bebida_acucar","estado":"deslize"},
+                    {"dia":"2026-11-04","habito":"bebida_acucar","estado":"sem_dado"},
+                    {"dia":"2026-11-05","habito":"xyz","estado":"na_meta"}]"""
+            ),
+        )
+    }
+
+    @Test
+    fun textosDoCartao() {
+        val j = montada()
+        assertEquals("Meta: nenhum dia com bebida com açúcar. Um deslize por semana é perdoado.", Jornada.textoMeta(j))
+        assertEquals("Meta: nenhum dia com bebida com açúcar.", Jornada.textoMeta(j.copy(seguro = true)))
+        val reduzir = j.copy(seguro = true, escolhas = j.escolhas + (Habito.BEBIDA_ACUCAR to Escolha.REDUZIR))
+        assertEquals("Meta: reduzir. ${Habito.BEBIDA_ACUCAR.teto}", Jornada.textoMeta(reduzir))
+        assertEquals(1, Jornada.numeroDaEtapa(j))
+        assertEquals(1, Jornada.numeroDaEtapa(Jornada.comVitoria(j, Habito.BEBIDA_ACUCAR, "2026-11-15")))
+
+        val r = periodo("2026-11-02", "2026-11-15", comCoca = setOf("2026-11-09", "2026-11-10", "2026-11-16"))
+        val p = progresso(r + lancado("2026-11-16", comCoca = true), hoje = "2026-11-16")
+        assertEquals("Semana passada: 2 dias com bebida com açúcar; a contagem recomeça.", Jornada.textoSemanaPassada(p.ultimaCompleta!!, Habito.BEBIDA_ACUCAR))
+        assertEquals("Hoje: teve bebida com açúcar 🔸. Um deslize por semana é perdoado.", Jornada.textoHoje(p, seguro = false))
+        assertEquals("Hoje: teve bebida com açúcar 🔸", Jornada.textoHoje(p, seguro = true))
+        val boa = progresso(periodo("2026-11-02", "2026-11-09"), hoje = "2026-11-09")
+        assertEquals("Semana passada: boa.", Jornada.textoSemanaPassada(boa.ultimaCompleta!!, Habito.BEBIDA_ACUCAR))
+        assertEquals("Hoje, até agora: sem bebida com açúcar ✅", Jornada.textoHoje(boa, seguro = false))
+        val vazia = progresso(periodo("2026-11-02", "2026-11-02"), hoje = "2026-11-09")
+        assertEquals("Semana passada: 1 dia lançado; ela não conta nem atrapalha.", Jornada.textoSemanaPassada(vazia.ultimaCompleta!!, Habito.BEBIDA_ACUCAR))
+        assertEquals("Hoje: ainda nada lançado nas refeições ⚪", Jornada.textoHoje(vazia, seguro = false))
+        val tocado = progresso(emptyList(), hoje = "2026-11-02", toques = mapOf("2026-11-02" to EstadoDia.NA_META))
+        assertEquals("Hoje: sem bebida com açúcar ✅ (corrigido por você)", Jornada.textoHoje(tocado, seguro = false))
+        val doisHoje = progresso(periodo("2026-11-02", "2026-11-03", comCoca = setOf("2026-11-02", "2026-11-03")), hoje = "2026-11-03")
+        assertEquals("Hoje: teve bebida com açúcar 🔸. A próxima semana é uma nova chance.", Jornada.textoHoje(doisHoje, seguro = false))
+
+        assertNull(Jornada.textoMantidos(j))
+        val comMantidos = Jornada.comVitoria(j.copy(escolhas = j.escolhas + (Habito.ALCOOL to Escolha.JA_NAO_FACO)), Habito.BEBIDA_ACUCAR, "2026-11-15")
+        assertEquals("Mantidos: Bebida com açúcar, Bebida alcoólica.", Jornada.textoMantidos(comMantidos))
+    }
+
+    @Test
+    fun textoDoFimDaMontagem() {
+        assertTrue(Jornada.textoDaEtapaNaMontagem(Habito.BEBIDA_ACUCAR, seguro = false, continua = false).startsWith("A Etapa 1 é a bebida com açúcar e começa hoje. Você vence a etapa com 2 semanas boas seguidas"))
+        assertEquals("A Etapa 1 é a bebida com açúcar e começa hoje. No modo seguro, você passa de etapa quando quiser.", Jornada.textoDaEtapaNaMontagem(Habito.BEBIDA_ACUCAR, seguro = true, continua = false))
+        assertEquals("A etapa em curso continua de onde está.", Jornada.textoDaEtapaNaMontagem(Habito.BEBIDA_ACUCAR, seguro = false, continua = true))
+        assertEquals(
+            "A bebida com açúcar já está nos mantidos. A próxima etapa chega numa nova versão do app.",
+            Jornada.textoDaEtapaNaMontagem(null, seguro = false, continua = false),
+        )
+        assertTrue(Jornada.continuaAEtapa(montada(), Habito.BEBIDA_ACUCAR))
+        assertFalse(Jornada.continuaAEtapa(JornadaSalva(), Habito.BEBIDA_ACUCAR))
+        assertFalse(Jornada.continuaAEtapa(montada(), null))
+        // Etapa já vencida: montar de novo não a recomeça, e o texto diz isso (logo depois da vitória,
+        // ou quando ela passou por "Já não faço" e voltou para "Vou eliminar").
+        val vencida = Jornada.comVitoria(montada(), Habito.BEBIDA_ACUCAR, "2026-11-15")
+        val textoVencida = "A etapa da bebida com açúcar já foi vencida e está nos mantidos. A próxima etapa chega numa nova versão do app."
+        assertTrue(Jornada.jaVencida(vencida, Habito.BEBIDA_ACUCAR))
+        assertFalse(Jornada.jaVencida(montada(), Habito.BEBIDA_ACUCAR))
+        assertFalse(Jornada.jaVencida(vencida, null))
+        assertEquals(textoVencida, Jornada.textoDaEtapaNaMontagem(Habito.BEBIDA_ACUCAR, seguro = false, continua = true, vencida = true))
+        val semBebida = Jornada.montar(vencida, false, vencida.escolhas + (Habito.BEBIDA_ACUCAR to Escolha.JA_NAO_FACO), emptyList(), "2026-11-20")
+        val deVolta = Jornada.continuaAEtapa(semBebida, Habito.BEBIDA_ACUCAR)
+        assertFalse(deVolta)
+        assertEquals(
+            textoVencida,
+            Jornada.textoDaEtapaNaMontagem(Habito.BEBIDA_ACUCAR, false, deVolta, Jornada.jaVencida(semBebida, Habito.BEBIDA_ACUCAR)),
+        )
+    }
+
+    @Test
+    fun perguntaDeSaudeTemOsSeisCasosEMandaSeguirOMedico() {
+        val p = Busca.normalizar(Jornada.PERGUNTA_SAUDE)
+        listOf("rins", "coracao", "figado", "insulina", "gravida", "transtorno alimentar").forEach { assertTrue(it, it in p) }
+        assertTrue(Jornada.TEXTO_MODO_SEGURO.contains("Siga o seu médico"))
+        assertTrue(Jornada.TEXTO_MODO_SEGURO_CARTAO.contains("Siga o seu médico"))
+    }
+
+    @Test
+    fun idsDosHabitosNuncaMudam() {
+        assertEquals(
+            listOf(
+                "bebida_acucar", "embutidos", "alcool", "cigarro", "cafe_cha_adocado", "suco_100", "doces",
+                "ultraprocessados", "delivery", "fritura", "carne_vermelha", "beliscar", "depois_jantar", "refri_zero",
+                "energetico_cafeina",
+            ),
+            Habito.entries.map { it.id },
+        )
+        assertEquals(listOf("eliminar", "reduzir", "ja_nao_faco", "nao_e_meu_caso"), Escolha.entries.map { it.id })
+        assertEquals(listOf("na_meta", "deslize", "sem_dado"), EstadoDia.entries.map { it.id })
     }
 }
