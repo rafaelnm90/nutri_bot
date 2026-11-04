@@ -8,6 +8,7 @@ import java.time.LocalDate
 /*
  * O perfil da pessoa (Ajustes) guardado nas preferências do celular, inclusive a
  * chave do Gemini, que nunca sai do aparelho a não ser nos pedidos ao próprio Gemini.
+ * A jornada de hábitos (JornadaAjustes) fica num arquivo de preferências à parte.
  */
 class Ajustes private constructor(contexto: Context) {
     private val prefs = contexto.getSharedPreferences("ajustes", Context.MODE_PRIVATE)
@@ -87,6 +88,74 @@ class Ajustes private constructor(contexto: Context) {
         fun de(contexto: Context): Ajustes =
             unico ?: synchronized(this) {
                 unico ?: Ajustes(contexto.applicationContext).also { unico = it }
+            }
+    }
+}
+
+/**
+ * A jornada de hábitos nas preferências "jornada", à parte do perfil: nunca usa as chaves
+ * "fase" e "inicio_fase" das fases da dieta. As regras ficam em Nutricao.kt (Jornada); aqui
+ * só se lê e se grava. As telas acompanham "salva", como acompanham o perfil.
+ */
+class JornadaAjustes private constructor(contexto: Context) {
+    private val prefs = contexto.getSharedPreferences("jornada", Context.MODE_PRIVATE)
+    private val _salva = MutableStateFlow(ler())
+
+    val salva: StateFlow<JornadaSalva> = _salva
+
+    /** O interruptor de Ajustes: vale na hora, sem o Salvar. Desligar não apaga nada. */
+    fun ligar(ligada: Boolean) = gravar(_salva.value.copy(ligada = ligada))
+
+    /** "Começar a jornada" (ou "Salvar as escolhas"): etapa nova começa hoje; a que já está em curso continua. */
+    fun montar(seguro: Boolean, escolhas: Map<Habito, Escolha>, outros: List<OutroHabito>) =
+        gravar(Jornada.montar(_salva.value, seguro, escolhas, outros, LocalDate.now().toString()))
+
+    /** Toque num dia da semana da etapa; null volta ao que o diário diz. */
+    fun tocar(dia: String, habito: Habito, estado: EstadoDia?) =
+        gravar(Jornada.comToque(_salva.value, dia, habito, estado))
+
+    fun vencer(habito: Habito, dia: String) = gravar(Jornada.comVitoria(_salva.value, habito, dia))
+
+    private fun ler() = JornadaSalva(
+        ligada = prefs.getBoolean("ligada", false),
+        montada = prefs.getBoolean("montada", false),
+        seguro = prefs.getBoolean("saude_sim", false),
+        escolhas = Jornada.escolhasDeTexto(prefs.getString("escolhas", null)),
+        outros = Jornada.outrosDeTexto(prefs.getString("outros", null)),
+        etapa = Habito.deId(prefs.getString("etapa", null)),
+        // Texto que não é data vira etapa sem início: o cartão do Diário, que reconta a etapa ao
+        // abrir o app, mostra "sem etapa" em vez de fechar o app, e montar de novo começa hoje.
+        inicioEtapa = prefs.getString("inicio_etapa", null)
+            ?.takeIf { runCatching { LocalDate.parse(it) }.isSuccess },
+        vencidas = Jornada.vencidasDeTexto(prefs.getString("vencidas", null)),
+        aguardando = prefs.getBoolean("aguardando", false),
+        toques = Jornada.toquesDeTexto(prefs.getString("toques", null)),
+    )
+
+    // Grava tudo de uma vez: o estado é pequeno, e assim nenhuma chave fica para trás.
+    private fun gravar(nova: JornadaSalva) {
+        prefs.edit()
+            .putBoolean("ligada", nova.ligada)
+            .putBoolean("montada", nova.montada)
+            .putBoolean("saude_sim", nova.seguro)
+            .putString("escolhas", Jornada.escolhasParaTexto(nova.escolhas))
+            .putString("outros", Jornada.outrosParaTexto(nova.outros))
+            .putString("etapa", nova.etapa?.id)
+            .putString("inicio_etapa", nova.inicioEtapa)
+            .putString("vencidas", Jornada.vencidasParaTexto(nova.vencidas))
+            .putBoolean("aguardando", nova.aguardando)
+            .putString("toques", Jornada.toquesParaTexto(nova.toques))
+            .apply()
+        _salva.value = nova
+    }
+
+    companion object {
+        @Volatile
+        private var unico: JornadaAjustes? = null
+
+        fun de(contexto: Context): JornadaAjustes =
+            unico ?: synchronized(this) {
+                unico ?: JornadaAjustes(contexto.applicationContext).also { unico = it }
             }
     }
 }
