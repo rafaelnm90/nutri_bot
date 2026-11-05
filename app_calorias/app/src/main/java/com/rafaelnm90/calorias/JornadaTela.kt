@@ -244,6 +244,10 @@ fun JornadaTela(aoVoltar: () -> Unit, aoComecar: () -> Unit) {
                     if (i > 0) HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
                     BlocoHabito(h, seguro, escolhas[h]) { escolher(h, it) }
                 }
+                // Só um aviso, sem botões e sem etapa: a principal fonte já saiu dos alimentos.
+                HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
+                Spacer(Modifier.height(8.dp))
+                TextoApagado(Jornada.TEXTO_GORDURA_TRANS)
             }
 
             Cartao {

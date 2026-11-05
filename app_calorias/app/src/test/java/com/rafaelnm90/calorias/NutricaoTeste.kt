@@ -1281,7 +1281,7 @@ Responda em texto simples, sem markdown e sem asteriscos, com linhas curtas e al
                 Jornada.PERGUNTA_SAUDE, Jornada.TEXTO_MODO_SEGURO, Jornada.TEXTO_MODO_SEGURO_CARTAO,
                 Jornada.TEXTO_RESPOSTA_SAUDE, Jornada.TEXTO_SUS, Jornada.TEXTO_PESO_CIGARRO, Jornada.TEXTO_LALLY,
                 Jornada.TEXTO_PROXIMA_VERSAO, Jornada.TEXTO_VER_SEMANA_PASSADA, Jornada.TEXTO_PRIMEIRA_PARADA_SEGURO,
-                Jornada.textoMeta(j),
+                Jornada.TEXTO_GORDURA_TRANS, Jornada.textoMeta(j),
                 Jornada.textoMeta(j.copy(seguro = true)),
                 Jornada.textoMeta(seguroReduzir),
             ) +
@@ -1402,6 +1402,18 @@ Responda em texto simples, sem markdown e sem asteriscos, com linhas curtas e al
         assertTrue(Busca.normalizar(Habito.ALCOOL.troca).contains("fora da gravidez, cerveja sem alcool"))
         assertTrue(Jornada.TEXTO_MODO_SEGURO.contains("Siga o seu médico"))
         assertTrue(Jornada.TEXTO_MODO_SEGURO_CARTAO.contains("Siga o seu médico"))
+    }
+
+    @Test
+    fun gorduraTransSoComoAvisoComANormaEmVigor() {
+        // Só um aviso, sem botões e sem etapa: o proibido é o óleo parcialmente hidrogenado, a
+        // principal fonte dela. A RDC 632/2022 substituiu a RDC 332/2019.
+        val t = Busca.normalizar(Jornada.TEXTO_GORDURA_TRANS)
+        listOf(
+            "gordura trans", "oleo parcialmente hidrogenado", "principal fonte",
+            "proibido nos alimentos no brasil desde 2023", "anvisa, rdc 632/2022",
+        ).forEach { assertTrue(it, it in t) }
+        assertFalse(t.contains("332/2019"))
     }
 
     @Test

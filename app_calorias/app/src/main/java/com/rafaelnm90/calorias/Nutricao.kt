@@ -1057,6 +1057,9 @@ object Jornada {
         "fica nos mantidos."
     /** No modo seguro, no lugar da primeira parada (na gravidez, por exemplo, não é hora de emagrecer). */
     const val TEXTO_PRIMEIRA_PARADA_SEGURO = "Com a sua resposta de saúde, combine a meta de peso com o seu médico."
+    /** No fim do cartão do que sai da rotina, depois do álcool: sem botões e sem etapa. */
+    const val TEXTO_GORDURA_TRANS = "Gordura trans: o óleo parcialmente hidrogenado, a principal fonte dela, é " +
+        "proibido nos alimentos no Brasil desde 2023 (ANVISA, RDC 632/2022), por isso ela não vira etapa."
 
     // --- Bebida com açúcar ---
 
