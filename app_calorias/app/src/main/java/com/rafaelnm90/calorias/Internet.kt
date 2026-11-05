@@ -97,27 +97,41 @@ $FORMATO_ITENS""",
         )
     )
 
-    suspend fun sugerirRefeicao(chave: String, alvo: AlvoRefeicao, objetivo: Objetivo, consumido: String): String {
+    /**
+     * [evitar]: o que a pessoa tirou da alimentação na jornada de hábitos
+     * (Jornada.evitarNaSugestao). Vazio, o pedido fica sem a linha do que evitar.
+     */
+    suspend fun sugerirRefeicao(
+        chave: String,
+        alvo: AlvoRefeicao,
+        objetivo: Objetivo,
+        consumido: String,
+        evitar: List<String> = emptyList(),
+    ): String = pedir(chave, textoSugestao(alvo, objetivo, consumido, evitar), null, json = false)
+
+    /** O pedido da sugestão de refeição, à parte para o teste conferir o texto. */
+    fun textoSugestao(alvo: AlvoRefeicao, objetivo: Objetivo, consumido: String, evitar: List<String> = emptyList()): String {
         val meta = when (objetivo) {
             Objetivo.PERDER -> "garantir o déficit calórico para emagrecer"
             Objetivo.GANHAR -> "atingir o superávit calórico para ganhar massa muscular"
             Objetivo.MANTER -> "manter o peso atual"
         }
-        return pedir(
-            chave,
-            """Você é um nutricionista experiente.
+        val eliminados = if (evitar.isEmpty()) {
+            ""
+        } else {
+            "A pessoa tirou da alimentação: ${evitar.joinToString("; ") { aspas(it) }}. " +
+                "Não sugira nada disso, nem como bebida ou acompanhamento.\n"
+        }
+        return """Você é um nutricionista experiente.
 A pessoa tem cerca de ${alvo.kcal} kcal para o ${alvo.periodo}, com o objetivo de $meta.
 Até agora, hoje, ela consumiu: $consumido.
 Atue de forma compensatória: se notar excesso de gordura, sugira opções magras; se faltar proteína,
 fibras ou vitamina C, priorize alimentos ricos nelas.
-
+${eliminados}
 Sugira 3 opções de refeição saudáveis, práticas e do dia a dia no Brasil, cuja soma fique perto de ${alvo.kcal} kcal.
 Para cada uma, dê as porções em gramas ou medidas caseiras, o total de calorias e uma frase de por que ela
 equilibra o dia. Seja encorajador.
-$TEXTO_SIMPLES""",
-            null,
-            json = false,
-        )
+$TEXTO_SIMPLES"""
     }
 
     /** Análise dos ingredientes da embalagem, no estilo do app Desrotulando. */

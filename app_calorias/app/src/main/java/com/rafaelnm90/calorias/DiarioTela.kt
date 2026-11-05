@@ -69,9 +69,10 @@ import java.time.format.DateTimeFormatter
 
 /*
  * A aba Diário: o resumo do dia (calorias na faixa, macros, nutrientes), o
- * check-in semanal das fases, as ferramentas de IA (sugerir refeição, ler
- * rótulo, relatório do dia), o jejum, as quatro refeições, os exercícios e a
- * água. As setas trocam o dia mostrado.
+ * check-in semanal das fases, o cartão da jornada de hábitos (só hoje, com a
+ * jornada ligada), as ferramentas de IA (sugerir refeição, ler rótulo,
+ * relatório do dia), o jejum, as quatro refeições, os exercícios e a água. As
+ * setas trocam o dia mostrado.
  */
 
 private val COR_OK = Color(0xFF1B7F5C)
@@ -83,12 +84,15 @@ fun DiarioTela(
     aoMudarDia: (String) -> Unit,
     aoAdicionar: (Refeicao) -> Unit,
     aoAbrirAjustes: () -> Unit,
+    aoMontarJornada: () -> Unit,
 ) {
     val contexto = LocalContext.current
     val banco = remember { Banco.de(contexto) }
     val ajustes = remember { Ajustes.de(contexto) }
     val versao by banco.versao.collectAsStateWithLifecycle()
     val perfil by ajustes.perfil.collectAsStateWithLifecycle()
+    val jornadaAjustes = remember { JornadaAjustes.de(contexto) }
+    val jornada by jornadaAjustes.salva.collectAsStateWithLifecycle()
     val escopo = rememberCoroutineScope()
 
     val registros = remember(versao, dia) { banco.registrosDoDia(dia) }
@@ -141,8 +145,10 @@ fun DiarioTela(
         val consumido = "proteínas ${inteiro(total.prot)} g, carboidratos ${inteiro(total.carb)} g, " +
             "gorduras ${inteiro(total.gord)} g, fibras ${inteiro(micros.fibra)} g, " +
             "vitamina C ${inteiro(micros.vitaminaC)} mg, zinco ${umaCasa(micros.zinco)} mg"
+        // O que a pessoa eliminou na jornada fica fora das sugestões; desligada, a lista vem vazia.
+        val evitar = Jornada.evitarNaSugestao(jornada)
         pedirTexto("💡 Sugestões para o ${alvo.periodo}", "Pensando em sugestões…") {
-            Gemini.sugerirRefeicao(perfil.chaveGemini, alvo, perfil.objetivo, consumido)
+            Gemini.sugerirRefeicao(perfil.chaveGemini, alvo, perfil.objetivo, consumido, evitar)
         }
     }
 
@@ -197,6 +203,9 @@ fun DiarioTela(
         }
         if (ehHoje && CheckIn.pendente(perfil, LocalDate.now())) {
             item { CheckInCartao(perfil.fase) { fase -> ajustes.concluirCheckIn(fase) } }
+        }
+        if (ehHoje && jornada.ligada) {
+            item { JornadaCartao(jornada, versao, aoMontarJornada, hojeTexto = dia) }
         }
         item { Resumo(total, metaKcal, meta, gastas, ehHoje) }
         item { NutrientesCartao(micros, MetasNutrientes.de(perfil, ano)) }

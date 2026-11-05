@@ -5,13 +5,17 @@ App Android pessoal de contagem de calorias, escrito do zero.
 - **Diário**: calorias do dia dentro de uma faixa, proteína, carboidrato e
   gordura com faixa, micronutrientes, as quatro refeições, exercícios, água
   (35 ml/kg, mais o volume de álcool e refrigerante) e jejum; check-in semanal
-  das fases; sugerir refeição, ler rótulo e relatório do dia pela IA.
+  das fases; sugerir refeição, ler rótulo e relatório do dia pela IA; com a
+  jornada de hábitos ligada, um cartão com a etapa da semana.
 - **Adicionar alimento**: busca na tabela TACO e nos alimentos já usados, foto
   do prato (o Gemini reconhece e estima, e dá para corrigir conversando),
   código de barras (Open Food Facts) e descrição em texto.
 - **Peso**: registro do peso, gráfico e meta.
 - **Ajustes**: perfil e fase da dieta (calculam a meta), metas de água e jejum,
-  lembretes e a chave do Gemini.
+  lembretes, a chave do Gemini e a jornada de hábitos.
+- **Jornada de hábitos** (opcional, ligada em Ajustes): um hábito por vez,
+  começando pela bebida com açúcar, conferido pelo diário, com um toque para
+  corrigir o dia.
 - **Lembretes**: água e comida atrasadas (8h às 22h), check-in e relatório.
 
 As regras e as funções de IA vêm do bot de nutrição do Rafael. O app mora na
