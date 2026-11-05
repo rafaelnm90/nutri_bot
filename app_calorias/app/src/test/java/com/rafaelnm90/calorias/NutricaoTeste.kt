@@ -1000,7 +1000,13 @@ class NutricaoTeste {
         assertEquals(listOf(Escolha.ELIMINAR, Escolha.REDUZIR, Escolha.JA_NAO_FACO), Jornada.opcoes(Habito.BEBIDA_ACUCAR, seguro = true))
         assertEquals(listOf(Escolha.ELIMINAR, Escolha.NAO_E_MEU_CASO), Jornada.opcoes(Habito.CIGARRO, seguro = true))
         assertEquals(Escolha.ELIMINAR, Jornada.escolhaInicial(Habito.ALCOOL, seguro = false))
-        assertEquals(Escolha.REDUZIR, Jornada.escolhaInicial(Habito.ALCOOL, seguro = true))
+        // No modo seguro o álcool continua em Eliminar (álcool zero na gravidez e no fígado; com
+        // insulina ou remédio que baixa o açúcar, risco de hipoglicemia), mas sem cadeado: dá para
+        // trocar para Reduzir.
+        assertEquals(Escolha.ELIMINAR, Jornada.escolhaInicial(Habito.ALCOOL, seguro = true))
+        assertTrue(Escolha.REDUZIR in Jornada.opcoes(Habito.ALCOOL, seguro = true))
+        assertEquals(Escolha.REDUZIR, Jornada.escolhaInicial(Habito.BEBIDA_ACUCAR, seguro = true))
+        assertEquals(Escolha.REDUZIR, Jornada.escolhaInicial(Habito.EMBUTIDOS, seguro = true))
         assertNull(Jornada.escolhaInicial(Habito.CIGARRO, seguro = false))
         // Reduzir num obrigatório fora do modo seguro vira Eliminar.
         val v = Jornada.escolhasValidas(mapOf(Habito.BEBIDA_ACUCAR to Escolha.REDUZIR), seguro = false)
@@ -1015,6 +1021,12 @@ class NutricaoTeste {
         assertEquals(Escolha.JA_NAO_FACO, s[Habito.ALCOOL])
         assertEquals(Escolha.REDUZIR, s[Habito.EMBUTIDOS])
         assertEquals(Escolha.ELIMINAR, s[Habito.DOCES])
+        // O sim na saúde leva o álcool para Eliminar, e o não volta tudo ao cadeado.
+        val sim = Jornada.aoMudarSaude(Jornada.escolhasIniciais(false) + (Habito.ALCOOL to Escolha.ELIMINAR), seguro = true)
+        assertEquals(Escolha.ELIMINAR, sim[Habito.ALCOOL])
+        val nao = Jornada.aoMudarSaude(sim + (Habito.ALCOOL to Escolha.REDUZIR), seguro = false)
+        assertEquals(listOf(Escolha.ELIMINAR, Escolha.ELIMINAR, Escolha.ELIMINAR),
+            listOf(nao[Habito.BEBIDA_ACUCAR], nao[Habito.EMBUTIDOS], nao[Habito.ALCOOL]))
         val seguro = Jornada.montar(JornadaSalva(ligada = true), true, Jornada.escolhasIniciais(true), emptyList(), "2026-11-02")
         assertEquals(Escolha.REDUZIR, seguro.escolhas[Habito.BEBIDA_ACUCAR])
         assertEquals(Habito.BEBIDA_ACUCAR, seguro.etapa)
@@ -1081,9 +1093,15 @@ class NutricaoTeste {
         )
         assertTrue(Jornada.evitarNaSugestao(j.copy(ligada = false)).isEmpty())
         assertTrue(Jornada.evitarNaSugestao(JornadaSalva(ligada = true)).isEmpty())
-        // No modo seguro, com tudo em Reduzir, nada vai para o pedido.
+        // No modo seguro, a bebida com açúcar e os embutidos em Reduzir não vão para o pedido; o
+        // álcool, que começa em Eliminar, vai.
         val seguro = Jornada.montar(JornadaSalva(ligada = true), true, Jornada.escolhasIniciais(true), emptyList(), "2026-11-02")
-        assertTrue(Jornada.evitarNaSugestao(seguro).isEmpty())
+        assertEquals(listOf(Habito.ALCOOL.paraIa), Jornada.evitarNaSugestao(seguro))
+        val tudoReduzir = Jornada.montar(
+            JornadaSalva(ligada = true), true, Jornada.escolhasIniciais(true) + (Habito.ALCOOL to Escolha.REDUZIR),
+            emptyList(), "2026-11-02",
+        )
+        assertTrue(Jornada.evitarNaSugestao(tudoReduzir).isEmpty())
     }
 
     @Test

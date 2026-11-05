@@ -1297,11 +1297,16 @@ object Jornada {
     }
 
     /**
-     * Já marcada ao abrir: o obrigatório em Eliminar, com cadeado (no modo seguro, Reduzir);
-     * o de reduzir em "Não é meu caso"; o cigarro sem nada, até a pessoa responder.
+     * Já marcada ao abrir: o obrigatório em Eliminar, com cadeado. No modo seguro, sem cadeado, a
+     * bebida com açúcar e os embutidos começam em Reduzir, e o álcool em Eliminar. O de reduzir
+     * começa em "Não é meu caso"; o cigarro sem nada, até a pessoa responder.
      */
     fun escolhaInicial(h: Habito, seguro: Boolean): Escolha? = when (h.grupo) {
-        GrupoHabito.OBRIGATORIO -> if (seguro) Escolha.REDUZIR else Escolha.ELIMINAR
+        // O álcool fica em Eliminar também no modo seguro, o mais seguro para quem respondeu sim: na
+        // gravidez e em doença do fígado o indicado é álcool zero, e com insulina ou remédio que pode
+        // baixar demais o açúcar ele pode dar hipoglicemia horas depois (ADA, 2025). DECISOES.md,
+        // "Jornada de hábitos".
+        GrupoHabito.OBRIGATORIO -> if (seguro && h != Habito.ALCOOL) Escolha.REDUZIR else Escolha.ELIMINAR
         GrupoHabito.CIGARRO -> null
         GrupoHabito.REDUZIR -> Escolha.NAO_E_MEU_CASO
     }
@@ -1320,8 +1325,9 @@ object Jornada {
     }
 
     /**
-     * A resposta de saúde mudou: os obrigatórios voltam à marcação inicial do modo novo
-     * (no seguro, Reduzir). "Já não faço" fica.
+     * A resposta de saúde mudou: os obrigatórios voltam à marcação inicial do modo novo, a de
+     * [escolhaInicial] (no seguro, a bebida com açúcar e os embutidos em Reduzir, e o álcool em
+     * Eliminar). "Já não faço" fica.
      */
     fun aoMudarSaude(escolhas: Map<Habito, Escolha>, seguro: Boolean): Map<Habito, Escolha> =
         escolhas.toMutableMap().apply {

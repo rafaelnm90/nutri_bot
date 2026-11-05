@@ -231,7 +231,8 @@ fun JornadaTela(aoVoltar: () -> Unit, aoComecar: () -> Unit) {
             }
 
             Cartao {
-                // No modo seguro os três começam em Reduzir: o título diz que eles também podem só diminuir.
+                // No modo seguro a bebida com açúcar e os embutidos começam em Reduzir (o álcool, em
+                // Eliminar): o título diz que eles também podem só diminuir.
                 TituloDoCartao(if (seguro) "O que sai ou diminui na rotina" else "🔒 O que sai da rotina")
                 Text(
                     if (seguro) {
