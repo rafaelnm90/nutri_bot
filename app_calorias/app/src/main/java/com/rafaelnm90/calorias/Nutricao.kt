@@ -1055,6 +1055,8 @@ object Jornada {
         "outros (2010), isso levou em média 66 dias, de 18 a 254. Por isso ele fica nos mantidos."
     const val TEXTO_PROXIMA_VERSAO = "A próxima etapa chega numa nova versão do app. Até lá, a etapa vencida " +
         "fica nos mantidos."
+    /** No modo seguro, no lugar da primeira parada (na gravidez, por exemplo, não é hora de emagrecer). */
+    const val TEXTO_PRIMEIRA_PARADA_SEGURO = "Com a sua resposta de saúde, combine a meta de peso com o seu médico."
 
     // --- Bebida com açúcar ---
 
@@ -1506,6 +1508,23 @@ object Jornada {
         if (objetivo != Objetivo.PERDER || pesoKg <= 0 || pesoMetaKg <= 0) return null
         if (pesoMetaKg >= pesoKg * 0.90) return null
         return pesoKg * 0.95 to pesoKg * 0.90
+    }
+
+    /**
+     * A linha da primeira parada na montagem; null quando ela não aparece. No modo seguro, no lugar
+     * dela, a meta de peso fica com o médico. [kg] escreve o peso como a tela (uma casa).
+     */
+    fun textoPrimeiraParada(
+        pesoKg: Double,
+        pesoMetaKg: Double,
+        objetivo: Objetivo,
+        seguro: Boolean,
+        kg: (Double) -> String,
+    ): String? {
+        val (com5, com10) = primeiraParada(pesoKg, pesoMetaKg, objetivo) ?: return null
+        if (seguro) return TEXTO_PRIMEIRA_PARADA_SEGURO
+        return "📍 Primeira parada: perder de 5% a 10% do peso de hoje, chegando entre ${kg(com10)} e " +
+            "${kg(com5)} kg. Ela já traz boa parte do benefício para a saúde (diretriz AHA/ACC/TOS, 2013)."
     }
 
     fun imc(pesoKg: Double, alturaCm: Double): Double? =

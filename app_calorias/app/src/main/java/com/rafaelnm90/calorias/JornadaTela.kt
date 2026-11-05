@@ -194,14 +194,10 @@ fun JornadaTela(aoVoltar: () -> Unit, aoComecar: () -> Unit) {
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 }
-                Jornada.primeiraParada(pesoKg, metaKg, objetivo)?.let { (com5, com10) ->
+                // Com o sim na saúde (logo abaixo), a linha troca na hora pela do médico.
+                Jornada.textoPrimeiraParada(pesoKg, metaKg, objetivo, seguro, ::umaCasa)?.let { texto ->
                     Spacer(Modifier.height(4.dp))
-                    Text(
-                        "📍 Primeira parada: perder de 5% a 10% do peso de hoje, chegando entre " +
-                            "${umaCasa(com10)} e ${umaCasa(com5)} kg. Ela já traz boa parte do benefício para a " +
-                            "saúde (diretriz AHA/ACC/TOS, 2013).",
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
+                    Text(texto, style = MaterialTheme.typography.bodyMedium)
                 }
                 // Aviso leve: nunca trava o botão do fim.
                 Jornada.avisoImc(metaKg, perfil.alturaCm, perfil.idade(LocalDate.now().year))?.let { a ->

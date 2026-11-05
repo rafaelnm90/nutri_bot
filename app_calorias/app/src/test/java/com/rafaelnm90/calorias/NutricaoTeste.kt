@@ -1166,6 +1166,24 @@ Responda em texto simples, sem markdown e sem asteriscos, com linhas curtas e al
     }
 
     @Test
+    fun primeiraParadaNoModoSeguroFicaComOMedico() {
+        val kg = { v: Double -> "%.1f".format(java.util.Locale.forLanguageTag("pt-BR"), v) }
+        assertEquals(
+            "📍 Primeira parada: perder de 5% a 10% do peso de hoje, chegando entre 90,0 e 95,0 kg. Ela já traz " +
+                "boa parte do benefício para a saúde (diretriz AHA/ACC/TOS, 2013).",
+            Jornada.textoPrimeiraParada(100.0, 85.0, Objetivo.PERDER, seguro = false, kg = kg),
+        )
+        // Com o sim na saúde (na gravidez, por exemplo), no lugar da parada, a meta fica com o médico.
+        assertEquals(
+            "Com a sua resposta de saúde, combine a meta de peso com o seu médico.",
+            Jornada.textoPrimeiraParada(100.0, 85.0, Objetivo.PERDER, seguro = true, kg = kg),
+        )
+        // Onde a parada não aparece, a linha do médico também não.
+        assertNull(Jornada.textoPrimeiraParada(100.0, 92.0, Objetivo.PERDER, seguro = true, kg = kg))
+        assertNull(Jornada.textoPrimeiraParada(100.0, 85.0, Objetivo.MANTER, seguro = true, kg = kg))
+    }
+
+    @Test
     fun primeiraParadaQuandoAMetaEstaLonge() {
         val p = Jornada.primeiraParada(100.0, 85.0, Objetivo.PERDER)!!
         assertEquals(95.0, p.first, 0.001)
@@ -1262,7 +1280,8 @@ Responda em texto simples, sem markdown e sem asteriscos, com linhas curtas e al
             listOf(
                 Jornada.PERGUNTA_SAUDE, Jornada.TEXTO_MODO_SEGURO, Jornada.TEXTO_MODO_SEGURO_CARTAO,
                 Jornada.TEXTO_RESPOSTA_SAUDE, Jornada.TEXTO_SUS, Jornada.TEXTO_PESO_CIGARRO, Jornada.TEXTO_LALLY,
-                Jornada.TEXTO_PROXIMA_VERSAO, Jornada.TEXTO_VER_SEMANA_PASSADA, Jornada.textoMeta(j),
+                Jornada.TEXTO_PROXIMA_VERSAO, Jornada.TEXTO_VER_SEMANA_PASSADA, Jornada.TEXTO_PRIMEIRA_PARADA_SEGURO,
+                Jornada.textoMeta(j),
                 Jornada.textoMeta(j.copy(seguro = true)),
                 Jornada.textoMeta(seguroReduzir),
             ) +
