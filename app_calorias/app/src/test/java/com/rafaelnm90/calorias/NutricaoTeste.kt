@@ -1359,9 +1359,28 @@ Responda em texto simples, sem markdown e sem asteriscos, com linhas curtas e al
     }
 
     @Test
-    fun perguntaDeSaudeTemOsSeisCasosEMandaSeguirOMedico() {
+    fun perguntaDeSaudeTemOsCasosEMandaSeguirOMedico() {
         val p = Busca.normalizar(Jornada.PERGUNTA_SAUDE)
-        listOf("rins", "coracao", "figado", "insulina", "gravida", "transtorno alimentar").forEach { assertTrue(it, it in p) }
+        listOf(
+            "rins", "coracao", "figado", "insulina", "gravidez", "transtorno alimentar",
+            // O remédio que pode baixar demais o açúcar também pode dar hipoglicemia, como a insulina;
+            // a amamentação vai com a gravidez.
+            "remedio para diabetes que pode baixar demais o acucar", "glibenclamida", "gliclazida", "amamentacao",
+        ).forEach { assertTrue(it, it in p) }
+        // Uma pergunta só, com os casos em lista.
+        assertEquals(1, Jornada.PERGUNTA_SAUDE.count { it == '?' })
+        // Quem usa esse remédio também trata a hipoglicemia com açúcar, sem contar como deslize.
+        assertTrue(Habito.BEBIDA_ACUCAR.motivo.contains("insulina ou remédio que pode baixar demais o açúcar"))
+        // O teto do álcool (só no modo seguro, em Reduzir) diz nada para os casos de álcool zero.
+        val teto = Busca.normalizar(Habito.ALCOOL.teto)
+        listOf("gravidez", "amamentacao", "figado", "insulina", "remedio que pode baixar demais o acucar", "nada")
+            .forEach { assertTrue(it, it in teto) }
+        // Na gravidez, nem com o médico: não há quantidade segura. E nada de "nunca 5 numa ocasião"
+        // junto de "2 por semana", que não fecha.
+        assertTrue(teto.contains("na gravidez: nada, porque nao ha quantidade segura"))
+        assertFalse(teto.contains("5 ou mais"))
+        // A cerveja sem álcool pode ter até 0,5% de álcool: na gravidez, nem ela.
+        assertTrue(Busca.normalizar(Habito.ALCOOL.troca).contains("fora da gravidez, cerveja sem alcool"))
         assertTrue(Jornada.TEXTO_MODO_SEGURO.contains("Siga o seu médico"))
         assertTrue(Jornada.TEXTO_MODO_SEGURO_CARTAO.contains("Siga o seu médico"))
     }

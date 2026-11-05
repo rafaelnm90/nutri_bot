@@ -751,7 +751,8 @@ enum class Habito(
             "fruta (esses três últimos ficam no Reduzir).",
         "Açúcar líquido não tira a fome e soma calorias sem você perceber: uma lata de 350 ml tem uns 35 g de " +
             "açúcar, quase todo o teto de 50 g do app. Não contam como deslize o isotônico em treino de mais de 1 hora " +
-            "ou no calor forte e o açúcar para tratar hipoglicemia de quem usa insulina: corrija o dia com um toque.",
+            "ou no calor forte e o açúcar para tratar hipoglicemia de quem usa insulina ou remédio que pode baixar " +
+            "demais o açúcar: corrija o dia com um toque.",
         "Até 1 copo de 200 ml por dia, uns 20 g de açúcar, ou nada (OMS, 2015: de preferência abaixo de 5% das calorias).",
         "OMS, açúcares (2015): açúcar livre abaixo de 10% das calorias; Guia Alimentar (Ministério da Saúde, 2014), " +
             "passo 4; DiMeglio e Mattes, International Journal of Obesity (2000): com 450 kcal por dia em refrigerante, " +
@@ -776,14 +777,17 @@ enum class Habito(
         "Cerveja, vinho, destilados e drinks.",
         "Nenhuma dose é segura para o câncer. O álcool tem 7 kcal por grama, e beber muito está ligado a ganho de " +
             "peso e desmonta a dieta do dia. Meta zero: um deslize por semana é perdoado e não apaga o que você já conquistou.",
-        // O teto só aparece no modo seguro, que inclui quem está grávida, tem doença do fígado ou
-        // usa insulina: para esses, nada de álcool sem o médico liberar.
-        "Na gravidez, em doença do fígado ou com insulina: nada, ou só o que o seu médico liberar. Nos outros " +
-            "casos, até 2 doses por semana e nunca 5 ou mais numa mesma ocasião (4 para mulher). Dose: 1 lata de " +
-            "cerveja, 1 taça de vinho ou 1 dose de destilado (Canadá, 2023; VIGITEL, Ministério da Saúde, 2023).",
+        // O teto só aparece no modo seguro, e só se a pessoa trocar o Eliminar por Reduzir. O modo
+        // seguro inclui quem está grávida ou amamentando, tem doença do fígado ou usa insulina ou
+        // remédio que baixa o açúcar. Na gravidez, nada, sem exceção: não há quantidade segura. Nos
+        // outros três casos, nada sem o médico liberar.
+        "Na gravidez: nada, porque não há quantidade segura. Na amamentação, em doença do fígado ou com insulina " +
+            "ou remédio que pode baixar demais o açúcar: nada, ou só o que o seu médico liberar. Nos outros casos, " +
+            "até 2 doses por semana (Canadá, 2023). Dose: 1 lata de cerveja, 1 taça de vinho ou 1 dose de " +
+            "destilado (VIGITEL, Ministério da Saúde, 2023).",
         "OMS Europa, Lancet Public Health (2023): não há nível seguro; Ministério da Saúde (Nota Técnica nº 263/2024, " +
             "reforçada em março de 2026); Traversy e Chaput, Current Obesity Reports (2015): beber muito está ligado a ganho de peso.",
-        troca = "água com gás com limão, chá gelado sem açúcar ou cerveja sem álcool.",
+        troca = "água com gás com limão, chá gelado sem açúcar ou, fora da gravidez, cerveja sem álcool.",
         paraIa = "bebida alcoólica",
     ),
     CIGARRO(
@@ -1026,8 +1030,15 @@ object Jornada {
     const val MAX_OUTROS = 5
     const val MAX_NOME_OUTRO = 40
 
-    const val PERGUNTA_SAUDE = "Você tem doença nos rins, no coração ou no fígado, usa insulina, está grávida ou " +
-        "tem (ou já teve) transtorno alimentar?"
+    // O remédio que pode baixar demais o açúcar (sulfonilureia) também pode dar hipoglicemia, como a
+    // insulina, embora com risco menor (ADA, 2025), e a amamentação vai junto com a gravidez. Em
+    // lista, porque são muitos casos para uma frase só na tela do celular.
+    const val PERGUNTA_SAUDE = "Algum destes é o seu caso?\n" +
+        "• doença nos rins, no coração ou no fígado;\n" +
+        "• uso de insulina ou de remédio para diabetes que pode baixar demais o açúcar (como glibenclamida ou " +
+        "gliclazida);\n" +
+        "• gravidez ou amamentação;\n" +
+        "• transtorno alimentar, agora ou no passado."
     const val TEXTO_MODO_SEGURO = "Modo seguro: sem cadeado (você escolhe entre eliminar e reduzir) e sem contar " +
         "semanas seguidas (você passa de etapa quando quiser). Siga o seu médico."
     const val TEXTO_MODO_SEGURO_CARTAO = "Modo seguro: você passa de etapa quando quiser. Siga o seu médico."
