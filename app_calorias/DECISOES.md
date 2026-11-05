@@ -61,7 +61,7 @@ riscar o antigo com "substituída em DD/MM/AAAA" e registrar o novo abaixo.
 - Exercícios: o treino descrito em texto; a IA estima as calorias pelo peso da pessoa. Aparecem como "Gastas" no resumo, sem mudar a meta. Resposta do Rafael em 11/10/2026: "só mostrar" (não somar na meta, como no Yazio; a IA costuma superestimar o gasto).
 - Lembretes no celular, das 8h às 22h, com as regras do bot: água atrasada 600 ml ou mais (de novo em 2,5 h se passa de 1 L, senão 4 h); comida atrasada mais de 35% do dia (de novo em 3 h se passa de 50%, senão 5 h). Diferença do bot: nenhum lembrete de comida durante o jejum. Também avisam o check-in semanal e, às 21 h, o relatório do dia.
 
-## Jornada de hábitos (03/11/2026 e 04/11/2026)
+## Jornada de hábitos (03/11/2026 a 05/11/2026)
 
 - 03/11/2026: pedido do Rafael: "o usuário é questionado onde quer chegar, o que quer eliminar de hábitos e o que quer reduzir; você também pode tomar a frente do que deve ser eliminado, uma vez que existem hábitos que não podem ser mantidos de forma alguma."
 - 03/11/2026: calorias como hoje (resposta do Rafael: "Contagem como hoje"): a jornada fica à parte, ligada em Ajustes. Calorias, fases da dieta, check-in e lembretes não mudam, com déficit desde o primeiro dia. Desligada, o app fica igual ao de antes da jornada.
@@ -91,13 +91,10 @@ riscar o antigo com "substituída em DD/MM/AAAA" e registrar o novo abaixo.
 - 04/11/2026: gordura trans: uma linha de aviso no fim da lista do eliminar, sem botões e sem etapa (resposta do Rafael: "Uma linha de aviso"): o óleo parcialmente hidrogenado, a principal fonte dela, é proibido nos alimentos no Brasil desde 2023 (ANVISA, RDC 632/2022, que substituiu a RDC 332/2019).
 - 04/11/2026: o sal (sódio) fica fora da lista do reduzir (resposta do Rafael: "Fica fora"): o teto de 2.000 mg de sódio por dia já está no cartão Nutrientes do Diário.
 - 04/11/2026: a jornada chega em passos. O passo 1 traz o interruptor em Ajustes, a tela Montar a jornada, o cartão no Diário, a etapa da bebida com açúcar, o aviso do jejum e o Sugerir refeição sem o que foi eliminado. As outras etapas, a conferência dos mantidos, a pausa, o mapa da jornada e os lembretes novos vêm nos próximos.
-
-Padrões da jornada (escolhidos pelo Claude, a confirmar com o Rafael):
-
-- A bebida com açúcar é achada pelo diário: é bebida pelo nome (uma lista da jornada, além das bebidas que o app já reconhece) ou pela marca "pede água". Ficam de fora o álcool e a cerveja sem álcool (a troca sugerida para ele), o zero, diet e light ("zero lactose" e "zero gordura" não contam como zero), a água, a água de coco, o café, o chá feito em casa, o leite puro e o suco 100%. Conta com 2,5 g de açúcar por 100 ml ou mais ou, sem o açúcar informado, com 5 g de carboidrato por 100 ml ou mais. Um toque no dia vale mais que a conta.
-- "Outro hábito" nunca aceita como eliminar uma refeição, um grupo inteiro (arroz, feijão, pão, fruta, leite, óleo), o sal ou a água, nem escritos de outro jeito ("cortar o pão", "arroz e feijão", "ficar sem jantar"), e explica o porquê. Reduzir sempre pode.
-- O cartão só aparece no dia de hoje.
-- A tela Montar a jornada abre pelo botão "Montar a jornada" em Ajustes, com a jornada ligada, e, enquanto a jornada não foi montada, pelo cartão do Diário; montar de novo é por Ajustes.
-- A linha da gordura trans fica no fim do cartão "O que sai da rotina", depois do álcool e antes do cartão do cigarro.
-- "Onde quer chegar" usa o peso, o peso meta e o objetivo do perfil, sem campos novos: o que mudar ali muda o perfil, e a meta de calorias calculada acompanha. A primeira parada aparece com o peso meta mais de 10% abaixo do peso de hoje.
-- O Sugerir refeição também evita o que está em "Já não faço" e os "Outro hábito" marcados como eliminar.
+- 05/11/2026: bebida pronta conta como bebida com açúcar a partir de 2,5 g de açúcar por 100 ml ou, sem o açúcar informado, de 5 g de carboidrato por 100 ml (resposta do Rafael: "2,5 g por 100 ml"; abaixo disso é "baixo teor de açúcar" no Regulamento CE 1924/2006). O app acha a bebida pelo diário: pelo nome (uma lista da jornada, além das bebidas que o app já reconhece) ou pela marca "pede água". Ficam de fora o álcool e a cerveja sem álcool (a troca sugerida para ele), o zero, diet e light ("zero lactose" e "zero gordura" não contam como zero), a água, a água de coco, o café, o chá feito em casa, o leite puro e o suco 100%. Um toque no dia vale mais que a conta.
+- 05/11/2026: "Outro hábito" nunca aceita como eliminar uma refeição, um grupo inteiro (arroz, feijão, pão, fruta, leite, óleo), o sal ou a água, nem escritos de outro jeito ("cortar o pão", "arroz e feijão", "ficar sem jantar"), e explica o porquê; reduzir sempre pode (resposta do Rafael: "Barra e explica").
+- 05/11/2026: o cartão da jornada só aparece no dia de hoje do Diário (resposta do Rafael: "Só hoje").
+- 05/11/2026: a tela Montar a jornada abre pelo botão "Montar a jornada" em Ajustes, com a jornada ligada, e, enquanto a jornada não foi montada, pelo cartão do Diário; montar de novo é por Ajustes (resposta do Rafael: "Ajustes e cartão").
+- 05/11/2026: a linha da gordura trans fica no fim do cartão "O que sai da rotina", depois do álcool e antes do cartão do cigarro (resposta do Rafael: "Depois do álcool").
+- 05/11/2026: "Onde quer chegar" usa o peso, o peso meta e o objetivo do perfil, sem campos novos: o que mudar ali muda o perfil, e a meta de calorias calculada acompanha (resposta do Rafael: "Os do perfil"). A primeira parada aparece com o peso meta mais de 10% abaixo do peso de hoje (resposta do Rafael: "Meta mais de 10% abaixo").
+- 05/11/2026: o Sugerir refeição evita tudo o que saiu da rotina: o que está em Eliminar ou em "Já não faço", nos obrigatórios, na lista do reduzir e em "Outro hábito" (resposta do Rafael: "Tudo o que saiu").
